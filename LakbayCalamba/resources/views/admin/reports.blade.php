@@ -25,10 +25,7 @@
             </div>
         </div>
         
-        <div class="print-chart">
-            <h3>Visitor Trends</h3>
-            <canvas id="printVisitorChart" width="800" height="400"></canvas>
-        </div>
+       
         
         <table class="print-table" id="printVisitorsTable">
             <thead>
@@ -166,216 +163,190 @@
     </style>
     
     <script>
-        function updateDateTime() {
-            const now = new Date();
-            const options = { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true };
-            document.getElementById('datetime').textContent = now.toLocaleDateString('en-US', options);
-        }
-        setInterval(updateDateTime, 1000); updateDateTime();
+    function updateDateTime() {
+        const now = new Date();
+        const options = { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true };
+        document.getElementById('datetime').textContent = now.toLocaleDateString('en-US', options);
+    }
+    setInterval(updateDateTime, 1000); updateDateTime();
 
-        const ctx = document.getElementById('visitorChart').getContext('2d');
-        let visitorChart = new Chart(ctx, {
-            type: 'line',
-            data: { labels: [], datasets: [{ label: 'Visitors', data: [], borderColor: 'rgb(37, 99, 235)', backgroundColor: 'rgba(37, 99, 235, 0.2)', fill: true, tension: 0.4, pointBackgroundColor: 'rgb(37, 99, 235)' }] },
-            options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+    const ctx = document.getElementById('visitorChart').getContext('2d');
+    let visitorChart = new Chart(ctx, {
+        type: 'line',
+        data: { labels: [], datasets: [{ label: 'Visitors', data: [], borderColor: 'rgb(37, 99, 235)', backgroundColor: 'rgba(37, 99, 235, 0.2)', fill: true, tension: 0.4, pointBackgroundColor: 'rgb(37, 99, 235)' }] },
+        options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+    });
+
+    const nf = (n) => Number(n || 0).toLocaleString();
+
+    function formatDateISO(d) { return d.toISOString().slice(0, 10); }
+    function getTodayRange() { const d = new Date(); const s = formatDateISO(d); return { start: s, end: s }; }
+    function getWeekRange() {
+        const d = new Date(); const day = d.getDay(); const diffToMonday = (day + 6) % 7;
+        const monday = new Date(d); monday.setDate(d.getDate() - diffToMonday);
+        const sunday = new Date(monday); sunday.setDate(monday.getDate() + 6);
+        return { start: formatDateISO(monday), end: formatDateISO(sunday) };
+    }
+    function getMonthRange() { const d = new Date(); const s = new Date(d.getFullYear(), d.getMonth(), 1); const e = new Date(d.getFullYear(), d.getMonth() + 1, 0); return { start: formatDateISO(s), end: formatDateISO(e) }; }
+    function daysBetweenInclusive(start, end) { const s = new Date(start), e = new Date(end); return Math.floor((e - s) / 86400000) + 1; }
+
+    function updateTable(daily) {
+        const tbody = document.getElementById('visitorsTable');
+        tbody.innerHTML = '';
+        daily.slice().reverse().forEach((row, i) => {
+            const tr = document.createElement('tr');
+            tr.className = i % 2 === 1 ? 'bg-gray-50' : '';
+            tr.innerHTML = `<td class="p-3">${row.date}</td><td class="p-3">${nf(row.total)}</td>`;
+            tbody.appendChild(tr);
         });
+    }
 
-        const nf = (n) => Number(n || 0).toLocaleString();
+    function updateSummaryCards(daily, show) {
+        const summary = document.getElementById('summaryCards');
+        if (!show) { summary.classList.add('hidden'); return; }
+        const total = daily.reduce((a, d) => a + (d.total || 0), 0);
+        const avg = Math.round(total / Math.max(daily.length, 1));
+        let peak = 0, peakLabel = '—';
+        daily.forEach(d => { if ((d.total || 0) > peak) { peak = d.total; peakLabel = d.date; } });
+        document.getElementById('totalVisitors').textContent = nf(total);
+        document.getElementById('avgDaily').textContent = `${nf(avg)}/day`;
+        document.getElementById('peakDay').textContent = `${peakLabel} (${nf(peak)} visitors)`;
+        summary.classList.remove('hidden');
+        
+        // Update print summary cards
+        document.getElementById('printTotalVisitors').textContent = nf(total);
+        document.getElementById('printAvgDaily').textContent = `${nf(avg)}/day`;
+        document.getElementById('printPeakDay').textContent = `${peakLabel} (${nf(peak)} visitors)`;
+    }
 
-        function formatDateISO(d) { return d.toISOString().slice(0, 10); }
-        function getTodayRange() { const d = new Date(); const s = formatDateISO(d); return { start: s, end: s }; }
-        function getWeekRange() {
-            const d = new Date(); const day = d.getDay(); const diffToMonday = (day + 6) % 7; const monday = new Date(d); monday.setDate(d.getDate() - diffToMonday); const sunday = new Date(monday); sunday.setDate(monday.getDate() + 6); return { start: formatDateISO(monday), end: formatDateISO(sunday) };
-        }
-        function getMonthRange() { const d = new Date(); const s = new Date(d.getFullYear(), d.getMonth(), 1); const e = new Date(d.getFullYear(), d.getMonth() + 1, 0); return { start: formatDateISO(s), end: formatDateISO(e) }; }
-        function daysBetweenInclusive(start, end) { const s = new Date(start), e = new Date(end); return Math.floor((e - s) / 86400000) + 1; }
+    async function loadReport(start, end, showSummary) {
+        const qs = `start_date=${encodeURIComponent(start)}&end_date=${encodeURIComponent(end)}`;
+        const res = await fetch(`/admin/reports/data?${qs}`, { headers: { 'Accept': 'application/json' } });
+        const json = await res.json();
+        if (!json.success) return;
 
-        function updateTable(daily) {
-            const tbody = document.getElementById('visitorsTable');
-            tbody.innerHTML = '';
-            daily.slice().reverse().forEach((row, i) => {
-                const tr = document.createElement('tr');
-                tr.className = i % 2 === 1 ? 'bg-gray-50' : '';
-                tr.innerHTML = `<td class="p-3">${row.date}</td><td class="p-3">${nf(row.total)}</td>`;
-                tbody.appendChild(tr);
-            });
-        }
+        const labels = json.daily.map(d => d.date);
+        const totals = json.daily.map(d => d.total);
 
-        function updateSummaryCards(daily, show) {
-            const summary = document.getElementById('summaryCards');
-            if (!show) { summary.classList.add('hidden'); return; }
-            const total = daily.reduce((a, d) => a + (d.total || 0), 0);
-            const avg = Math.round(total / Math.max(daily.length, 1));
-            let peak = 0, peakLabel = '—';
-            daily.forEach(d => { if ((d.total || 0) > peak) { peak = d.total; peakLabel = d.date; } });
-            document.getElementById('totalVisitors').textContent = nf(total);
-            document.getElementById('avgDaily').textContent = `${nf(avg)}/day`;
-            document.getElementById('peakDay').textContent = `${peakLabel} (${nf(peak)} visitors)`;
-            summary.classList.remove('hidden');
-            
-            // Update print summary cards
-            document.getElementById('printTotalVisitors').textContent = nf(total);
-            document.getElementById('printAvgDaily').textContent = `${nf(avg)}/day`;
-            document.getElementById('printPeakDay').textContent = `${peakLabel} (${nf(peak)} visitors)`;
-        }
+        visitorChart.data.labels = labels;
+        visitorChart.data.datasets[0].data = totals;
+        visitorChart.update();
 
-        async function loadReport(start, end, showSummary) {
-            const qs = `start_date=${encodeURIComponent(start)}&end_date=${encodeURIComponent(end)}`;
-            const res = await fetch(`/admin/reports/data?${qs}`, { headers: { 'Accept': 'application/json' } });
-            const json = await res.json();
-            if (!json.success) return;
+        const today = new Date();
+        const todayLabel = today.toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' });
+        const todayIndex = labels.findIndex(l => l === todayLabel);
+        const todaysTotal = todayIndex >= 0 ? totals[todayIndex] : (totals[totals.length - 1] || 0);
+        document.getElementById('visitorsToday').textContent = nf(todaysTotal);
 
-            const labels = json.daily.map(d => d.date);
-            const totals = json.daily.map(d => d.total);
+        updateTable(json.daily);
+        updateSummaryCards(json.daily, showSummary);
 
-            visitorChart.data.labels = labels;
-            visitorChart.data.datasets[0].data = totals;
-            visitorChart.update();
+        const downloadWrapper = document.getElementById('downloadWrapper');
+        const downloadReport = document.getElementById('downloadReport');
+        const exportPdf = document.getElementById('exportPdf');
+        const printReport = document.getElementById('printReport');
+        
+        // ✅ Always show buttons after loading
+        downloadWrapper.classList.remove('hidden');
 
-            const today = new Date();
-            const todayLabel = today.toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' });
-            const todayIndex = labels.findIndex(l => l === todayLabel);
-            const todaysTotal = todayIndex >= 0 ? totals[todayIndex] : (totals[totals.length - 1] || 0);
-            document.getElementById('visitorsToday').textContent = nf(todaysTotal);
+        downloadReport.onclick = () => { window.location.href = `/admin/reports/export?${qs}`; };
+        exportPdf.onclick = () => { exportToPDF(); };
+        printReport.onclick = () => { printReportPage(); };
+    }
 
-            updateTable(json.daily);
-            updateSummaryCards(json.daily, showSummary);
+    const filterButtons = document.querySelectorAll('#filterButtons button');
+    const customRangePicker = document.getElementById('customRangePicker');
 
-            const downloadWrapper = document.getElementById('downloadWrapper');
-            const downloadReport = document.getElementById('downloadReport');
-            const exportPdf = document.getElementById('exportPdf');
-            const printReport = document.getElementById('printReport');
-            
-            downloadWrapper.classList.remove('hidden');
-            downloadReport.onclick = () => { window.location.href = `/admin/reports/export?${qs}`; };
-            exportPdf.onclick = () => { exportToPDF(); };
-            printReport.onclick = () => { printReportPage(); };
-            if (!showSummary) downloadWrapper.classList.add('hidden');
-        }
+    filterButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            filterButtons.forEach(btn => btn.classList.remove('bg-blue-600', 'text-white'));
+            filterButtons.forEach(btn => btn.classList.add('bg-white', 'text-gray-700', 'border'));
+            button.classList.remove('bg-white', 'text-gray-700', 'border');
+            button.classList.add('bg-blue-600', 'text-white');
 
-        const filterButtons = document.querySelectorAll('#filterButtons button');
-        const customRangePicker = document.getElementById('customRangePicker');
-
-        filterButtons.forEach(button => {
-            button.addEventListener('click', () => {
-                filterButtons.forEach(btn => btn.classList.remove('bg-blue-600', 'text-white'));
-                filterButtons.forEach(btn => btn.classList.add('bg-white', 'text-gray-700', 'border'));
-                button.classList.remove('bg-white', 'text-gray-700', 'border');
-                button.classList.add('bg-blue-600', 'text-white');
-
-                const filter = button.dataset.filter;
-                if (filter === 'custom') {
-                    customRangePicker.classList.remove('hidden');
-                    document.getElementById('summaryCards').classList.add('hidden');
-                    document.getElementById('downloadWrapper').classList.add('hidden');
-                } else {
-                    customRangePicker.classList.add('hidden');
-                    if (filter === 'today') {
-                        const r = getTodayRange();
-                        loadReport(r.start, r.end, false);
-                    } else if (filter === 'week') {
-                        const r = getWeekRange();
-                        loadReport(r.start, r.end, true);
-                    } else if (filter === 'month') {
-                        const r = getMonthRange();
-                        loadReport(r.start, r.end, true);
-                    }
+            const filter = button.dataset.filter;
+            if (filter === 'custom') {
+                customRangePicker.classList.remove('hidden');
+                document.getElementById('summaryCards').classList.add('hidden');
+            } else {
+                customRangePicker.classList.add('hidden');
+                if (filter === 'today') {
+                    const r = getTodayRange();
+                    loadReport(r.start, r.end, false);
+                } else if (filter === 'week') {
+                    const r = getWeekRange();
+                    loadReport(r.start, r.end, true);
+                } else if (filter === 'month') {
+                    const r = getMonthRange();
+                    loadReport(r.start, r.end, true);
                 }
-            });
+            }
         });
+    });
 
-        document.getElementById('applyCustomRange').addEventListener('click', () => {
-            const start = document.getElementById('startDate').value;
-            const end = document.getElementById('endDate').value;
-            if (!start || !end) { alert('Please select both start and end dates'); return; }
-            const days = daysBetweenInclusive(start, end);
-            const showSummary = days > 1;
-            loadReport(start, end, showSummary);
-        });
+    document.getElementById('applyCustomRange').addEventListener('click', () => {
+        const start = document.getElementById('startDate').value;
+        const end = document.getElementById('endDate').value;
+        if (!start || !end) { alert('Please select both start and end dates'); return; }
+        const days = daysBetweenInclusive(start, end);
+        const showSummary = days > 1;
+        loadReport(start, end, showSummary);
+    });
 
-        (function initialLoad(){ const r = getTodayRange(); loadReport(r.start, r.end, false); })();
+    (function initialLoad(){ const r = getTodayRange(); loadReport(r.start, r.end, false); })();
 
-        // PDF Export Function
-        function exportToPDF() {
-            // Update print datetime
-            const now = new Date();
-            const options = { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true };
-            document.getElementById('printDateTime').textContent = now.toLocaleDateString('en-US', options);
-            
-            // Update print table
-            updatePrintTable();
-            
-            // Create print chart
-            createPrintChart();
-            
-            // Generate PDF
-            const element = document.querySelector('.printable-content');
-            const opt = {
-                margin: 1,
-                filename: `lakbay-calamba-report-${new Date().toISOString().slice(0, 10)}.pdf`,
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2 },
-                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
-            };
-            
-            html2pdf().set(opt).from(element).save();
-        }
+    // ✅ Clone chart as image for printable version
+    function cloneChartForPrint() {
+        const existingCanvas = document.getElementById('visitorChart');
+        const img = document.createElement('img');
+        img.src = existingCanvas.toDataURL('image/png');
+        img.alt = 'Visitor Trends Chart';
+        img.style.width = '100%';
+        img.style.marginTop = '20px';
 
-        // Print Function
-        function printReportPage() {
-            // Update print datetime
-            const now = new Date();
-            const options = { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true };
-            document.getElementById('printDateTime').textContent = now.toLocaleDateString('en-US', options);
-            
-            // Update print table
-            updatePrintTable();
-            
-            // Create print chart
-            createPrintChart();
-            
-            // Print
-            window.print();
-        }
+        const printableContent = document.querySelector('.printable-content');
+        const oldImg = printableContent.querySelector('img[alt="Visitor Trends Chart"]');
+        if (oldImg) oldImg.remove(); // remove old one if exists
+        printableContent.appendChild(img);
+    }
 
-        // Update print table
-        function updatePrintTable() {
-            const tbody = document.querySelector('#printVisitorsTable tbody');
-            const originalTbody = document.getElementById('visitorsTable');
-            tbody.innerHTML = originalTbody.innerHTML;
-        }
+    // ✅ PDF Export Function
+    function exportToPDF() {
+        const now = new Date();
+        const options = { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true };
+        document.getElementById('printDateTime').textContent = now.toLocaleDateString('en-US', options);
+        updatePrintTable();
+        cloneChartForPrint(); // use same chart image
 
-        // Create print chart
-        function createPrintChart() {
-            const ctx = document.getElementById('printVisitorChart').getContext('2d');
-            const originalChart = visitorChart;
-            
-            new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: originalChart.data.labels,
-                    datasets: [{
-                        label: 'Visitors',
-                        data: originalChart.data.datasets[0].data,
-                        borderColor: 'rgb(37, 99, 235)',
-                        backgroundColor: 'rgba(37, 99, 235, 0.2)',
-                        fill: true,
-                        tension: 0.4,
-                        pointBackgroundColor: 'rgb(37, 99, 235)'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: { display: false }
-                    },
-                    scales: {
-                        y: { beginAtZero: true }
-                    }
-                }
-            });
-        }
-    </script>
+        const element = document.querySelector('.printable-content');
+        const opt = {
+            margin: 1,
+            filename: `lakbay-calamba-report-${new Date().toISOString().slice(0, 10)}.pdf`,
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2 },
+            jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+        };
+        html2pdf().set(opt).from(element).save();
+    }
+
+    // ✅ Print Function
+    function printReportPage() {
+        const now = new Date();
+        const options = { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true };
+        document.getElementById('printDateTime').textContent = now.toLocaleDateString('en-US', options);
+        updatePrintTable();
+        cloneChartForPrint(); // reuse same chart
+        window.print();
+    }
+
+    // ✅ Update print table
+    function updatePrintTable() {
+        const tbody = document.querySelector('#printVisitorsTable tbody');
+        const originalTbody = document.getElementById('visitorsTable');
+        tbody.innerHTML = originalTbody.innerHTML;
+    }
+</script>
+
 @endsection
 
 
