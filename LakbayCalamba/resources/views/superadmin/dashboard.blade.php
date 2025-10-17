@@ -151,19 +151,29 @@
         <div class="flex items-center justify-between mb-4">
             <h3 class="text-lg font-semibold text-gray-800">Visitors Tracking</h3>
             <div class="flex items-center space-x-2">
-                <select class="border border-gray-300 rounded-lg px-3 py-1 text-sm">
-                    <option>Sort By</option>
-                    <option></option>
-                    <option>Sort By</option>
-
-                </select>
-                <button class="flex items-center space-x-1 bg-gray-100 hover:bg-gray-200 px-3 py-1 rounded-lg text-sm transition-colors">
-                    <i data-lucide="filter" class="w-4 h-4"></i>
-                    <span>Descending</span>
-                </button>
-                <button class="p-1 text-gray-500 hover:text-gray-700 transition-colors">
-                    <i data-lucide="maximize-2" class="w-4 h-4"></i>
-                </button>
+                <form method="GET" action="{{ route('superadmin.dashboard') }}" class="flex items-center space-x-2">
+                    @php($isCustomRange = request('start_date') || request('end_date'))
+                    @php($currentSort = $sort ?? ($isCustomRange ? 'custom' : 'today'))
+                    <input type="hidden" name="start_date" value="{{ request('start_date', $startDate->format('Y-m-d')) }}">
+                    <input type="hidden" name="end_date" value="{{ request('end_date', $endDate->format('Y-m-d')) }}">
+                    <label for="sort" class="sr-only">Sort By</label>
+                    <select id="sort" name="sort" class="border border-gray-300 rounded-lg px-3 py-1 text-sm">
+                        <option value="establishment" {{ $currentSort==='establishment' ? 'selected' : '' }}>Establishment</option>
+                        @if($isCustomRange)
+                            <option value="custom" {{ $currentSort==='custom' ? 'selected' : '' }}>Custom Range</option>
+                        @else
+                            <option value="today" {{ $currentSort==='today' ? 'selected' : '' }}>Today</option>
+                            <option value="week" {{ $currentSort==='week' ? 'selected' : '' }}>This Week</option>
+                            <option value="month" {{ $currentSort==='month' ? 'selected' : '' }}>This Month</option>
+                        @endif
+                    </select>
+                    <label for="order" class="sr-only">Order</label>
+                    <select id="order" name="order" class="border border-gray-300 rounded-lg px-3 py-1 text-sm">
+                        <option value="desc" {{ ($order ?? 'desc')==='desc' ? 'selected' : '' }}>Descending</option>
+                        <option value="asc" {{ ($order ?? 'desc')==='asc' ? 'selected' : '' }}>Ascending</option>
+                    </select>
+                    <button type="submit" class="bg-gray-100 hover:bg-gray-200 px-3 py-1 rounded-lg text-sm transition-colors">Apply</button>
+                </form>
             </div>
         </div>
         <div class="overflow-x-auto">

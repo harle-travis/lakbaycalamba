@@ -15,6 +15,10 @@ class SuperAdminController extends Controller
         // Get current date and time
         $now = Carbon::now();
         
+        // Sorting for Visitors Tracking
+        $sort = $request->get('sort'); // e.g., establishment, today, week, month, custom
+        $order = strtolower($request->get('order', 'desc')) === 'asc' ? 'asc' : 'desc';
+
         // Handle custom date range from request
         $startDate = $request->get('start_date') ? Carbon::parse($request->get('start_date'))->startOfDay() : $now->copy()->startOfMonth();
         $endDate = $request->get('end_date') ? Carbon::parse($request->get('end_date'))->endOfDay() : $now->copy()->endOfDay();
@@ -112,6 +116,21 @@ class SuperAdminController extends Controller
             $establishment->month_visitors = $establishment->month_stamps + $establishment->month_guests;
             $establishment->custom_range_visitors = $establishment->custom_range_stamps + $establishment->custom_range_guests;
         }
+
+        // Apply sorting based on request
+        $isCustomRange = $request->filled('start_date') || $request->filled('end_date');
+        $defaultSortKey = $isCustomRange ? 'custom_range_visitors' : 'today_visitors';
+        $sortKeyMap = [
+            'establishment' => 'establishment_name',
+            'today' => 'today_visitors',
+            'week' => 'week_visitors',
+            'month' => 'month_visitors',
+            'custom' => 'custom_range_visitors',
+        ];
+        $sortKey = $sortKeyMap[$sort] ?? $defaultSortKey;
+        $establishmentStats = $order === 'asc'
+            ? $establishmentStats->sortBy($sortKey)->values()
+            : $establishmentStats->sortByDesc($sortKey)->values();
         
         // Get visitor trends for the selected range (inclusive), grouped by day (stamps + guests)
         $visitorTrends = [];
@@ -148,7 +167,9 @@ class SuperAdminController extends Controller
             'visitorTrends',
             'startDate',
             'endDate',
-            'visitorTrendsTitle'
+            'visitorTrendsTitle',
+            'sort',
+            'order'
         ));
     }
 
