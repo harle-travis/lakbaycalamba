@@ -41,9 +41,7 @@
         </table>
     </div>
 
-    <div class="flex justify-end mb-6 no-print">
-        <span id="datetime" class="text-gray-600"></span>
-    </div>
+    
 
     <div class="flex space-x-2 mb-4 no-print" id="filterButtons">
         <button data-filter="today" class="px-4 py-2 bg-blue-600 text-white rounded">Today</button>
