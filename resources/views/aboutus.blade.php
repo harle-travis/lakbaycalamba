@@ -85,10 +85,7 @@
                 <div>
                     <h3 class="text-2xl font-bold text-blue-600 mb-4">Our Mission</h3>
                     <p class="text-gray-700 text-sm sm:text-base leading-snug text-justify mt-1">
-                        HAHAHAHAHAHAHAHHAHOur mission is to promote local tourism in Calamba by using digital tools that make exploring
-                        easier, more engaging, and accessible for everyone. We aim to support both travelers and local
-                        tourism offices in preserving culture, boosting visitor interest, and encouraging appreciation
-                        of historical landmarks and natural attractions.
+                        HAHAHAHAHAHAHAHHAHq
                     </p>
                 </div>
                 <div>
