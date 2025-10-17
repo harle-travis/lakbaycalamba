@@ -155,6 +155,20 @@ class StampController extends Controller
             ], 404);
         }
 
+        // If QR code is missing, generate and persist it on-demand
+        if (empty($establishment->qr_code)) {
+            try {
+                $qrUrl = url("/stamp/process/{$establishment->id}");
+                $qrCode = \SimpleSoftwareIO\QrCode\Facades\QrCode::size(200)->generate($qrUrl);
+                $establishment->update(['qr_code' => $qrCode]);
+            } catch (\Exception $e) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed to generate QR code: ' . $e->getMessage()
+                ], 500);
+            }
+        }
+
         return response()->json([
             'success' => true,
             'qr_code' => $establishment->qr_code,

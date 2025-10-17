@@ -1004,4 +1004,8 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
+
+<script>
+    window.STORAGE_BASE_URL = "{{ rtrim(Storage::url(''), '/') }}";
+</script>
 @endsection

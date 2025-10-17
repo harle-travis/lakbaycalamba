@@ -753,14 +753,14 @@ function viewPhotos(establishmentId) {
             const photosHTML = data.pictures.map((picture, index) => `
                 <div class="flex flex-col items-center">
                     <div class="mb-2 text-sm text-gray-600">Photo ${index + 1}: ${picture.image_path}</div>
-                    <img src="/storage/${picture.image_path}" 
+                    <img src="${(window.STORAGE_BASE_URL || '')}/${picture.image_path}" 
                          alt="${establishmentName}" 
                          class="max-w-full h-auto max-h-96 rounded-lg shadow-lg"
                          onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
                     <div style="display: none; text-align: center; padding: 20px; color: #666;">
                         <i data-lucide="image-off" class="w-16 h-16 text-gray-400 mx-auto mb-4"></i>
                         <p>Image could not be loaded</p>
-                        <p class="text-xs">Path: /storage/${picture.image_path}</p>
+                        <p class="text-xs">Path: ${(window.STORAGE_BASE_URL || '')}/${picture.image_path}</p>
                     </div>
                 </div>
             `).join('');
@@ -922,7 +922,7 @@ function editEstablishment(id) {
                 const pictureDiv = document.createElement('div');
                 pictureDiv.className = 'relative';
                 pictureDiv.innerHTML = `
-                    <img src="/storage/${picture.image_path}" 
+                    <img src="${(window.STORAGE_BASE_URL || '')}/${picture.image_path}" 
                          alt="Current photo ${index + 1}" 
                          class="w-full h-24 object-cover rounded-lg">
                     <button type="button" 

@@ -922,6 +922,8 @@
          </div>
      </div>
  </div>
- 
+ <script>
+     window.STORAGE_BASE_URL = "{{ rtrim(Storage::url(''), '/') }}";
+ </script>
    <script src="{{ asset('js/manage-establishments.js') }}"></script>
 @endsection
