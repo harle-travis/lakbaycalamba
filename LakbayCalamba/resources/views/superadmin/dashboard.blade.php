@@ -268,5 +268,17 @@
             }
         }
     });
+
+    // Default Visitors Tracking sort to Custom Range when a date range is active
+    (function() {
+        const isCustomRange = {{ (request('start_date') || request('end_date')) ? 'true' : 'false' }};
+        const hasExplicitSort = {{ request()->has('sort') ? 'true' : 'false' }};
+        if (isCustomRange && !hasExplicitSort) {
+            const sortSelect = document.getElementById('sort');
+            if (sortSelect) {
+                sortSelect.value = 'custom';
+            }
+        }
+    })();
 </script>
 @endsection
