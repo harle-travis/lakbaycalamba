@@ -12,38 +12,7 @@
 
 @section('content')
 <div class="p-6">
-    <!-- Date and Time Display with Date Picker -->
-    <div class="flex justify-between items-center mb-6">
-        <div class="flex items-center space-x-4">
-            <form method="GET" action="{{ route('superadmin.dashboard') }}" class="flex items-center space-x-3">
-                <div class="flex items-center space-x-2">
-                    <label for="start_date" class="text-sm font-medium text-gray-700">From:</label>
-                    <input type="date" 
-                           id="start_date" 
-                           name="start_date" 
-                           value="{{ request('start_date', $startDate->format('Y-m-d')) }}"
-                           class="border border-gray-300 rounded-lg px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-                </div>
-                <div class="flex items-center space-x-2">
-                    <label for="end_date" class="text-sm font-medium text-gray-700">To:</label>
-                    <input type="date" 
-                           id="end_date" 
-                           name="end_date" 
-                           value="{{ request('end_date', $endDate->format('Y-m-d')) }}"
-                           class="border border-gray-300 rounded-lg px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-                </div>
-                <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1 rounded-lg text-sm transition-colors">
-                    Apply
-                </button>
-                <a href="{{ route('superadmin.dashboard') }}" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-1 rounded-lg text-sm transition-colors">
-                    Reset
-                </a>
-            </form>
-        </div>
-        <div class="flex items-center space-x-4">
-            <span id="datetime" class="text-gray-600 text-sm"></span>
-        </div>
-    </div>
+    
 
     <!-- Stats Cards -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -131,6 +100,39 @@
                     <i data-lucide="map-pin" class="w-6 h-6"></i>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Date and Time Display with Date Picker -->
+    <div class="flex justify-between items-center mb-6">
+        <div class="flex items-center space-x-4">
+            <form method="GET" action="{{ route('superadmin.dashboard') }}" class="flex items-center space-x-3">
+                <div class="flex items-center space-x-2">
+                    <label for="start_date" class="text-sm font-medium text-gray-700">From:</label>
+                    <input type="date" 
+                           id="start_date" 
+                           name="start_date" 
+                           value="{{ request('start_date', $startDate->format('Y-m-d')) }}"
+                           class="border border-gray-300 rounded-lg px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div class="flex items-center space-x-2">
+                    <label for="end_date" class="text-sm font-medium text-gray-700">To:</label>
+                    <input type="date" 
+                           id="end_date" 
+                           name="end_date" 
+                           value="{{ request('end_date', $endDate->format('Y-m-d')) }}"
+                           class="border border-gray-300 rounded-lg px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1 rounded-lg text-sm transition-colors">
+                    Apply
+                </button>
+                <a href="{{ route('superadmin.dashboard') }}" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-1 rounded-lg text-sm transition-colors">
+                    Reset
+                </a>
+            </form>
+        </div>
+        <div class="flex items-center space-x-4">
+            <span id="datetime" class="text-gray-600 text-sm"></span>
         </div>
     </div>
 
