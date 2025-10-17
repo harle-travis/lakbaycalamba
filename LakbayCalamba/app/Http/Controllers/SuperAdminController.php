@@ -326,4 +326,22 @@ class SuperAdminController extends Controller
 
         return str_replace(array_keys($placeholders), array_values($placeholders), $content);
     }
+
+    public function updateEmail(Request $request)
+    {
+        $user = auth()->user();
+
+        $validated = $request->validate([
+            'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
+        ]);
+
+        $user->email = $validated['email'];
+        $user->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Email updated successfully.',
+            'email' => $user->email,
+        ]);
+    }
 }

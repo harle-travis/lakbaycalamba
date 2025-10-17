@@ -119,6 +119,7 @@ Route::middleware(['auth', 'role:superadmin'])->prefix('superadmin')->name('supe
                 Route::delete('/admins/{admin}', [App\Http\Controllers\AdminController::class, 'destroy'])->name('admins.destroy');
                 Route::view('/settings', 'superadmin.settings')->name('settings');
                 Route::post('/change-password', [App\Http\Controllers\AdminController::class, 'changePassword'])->name('change-password');
+                Route::post('/update-email', [App\Http\Controllers\SuperAdminController::class, 'updateEmail'])->name('update-email');
                 
                 // Tourist management routes
                 Route::get('/manage-tourists', [TouristController::class, 'index'])->name('manage-tourists');
