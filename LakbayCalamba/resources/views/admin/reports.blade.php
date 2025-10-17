@@ -4,42 +4,7 @@
 
 @section('content')
     <!-- Printable content wrapper -->
-    <div class="printable-content no-print">
-        <div class="print-header">
-            <h1>Lakbay Calamba - Visitor Reports</h1>
-            <p>Generated on: <span id="printDateTime"></span></p>
-        </div>
-        
-        <div class="print-summary" id="printSummaryCards">
-            <div class="print-summary-item">
-                <div class="text-xs text-gray-500 mb-1">Total Visitors</div>
-                <div id="printTotalVisitors" class="text-3xl font-bold">0</div>
-            </div>
-            <div class="print-summary-item">
-                <div class="text-xs text-gray-500 mb-1">Avg Daily Visitors</div>
-                <div id="printAvgDaily" class="text-3xl font-bold">0/day</div>
-            </div>
-            <div class="print-summary-item">
-                <div class="text-xs text-gray-500 mb-1">Peak Day</div>
-                <div id="printPeakDay" class="text-2xl font-bold">—</div>
-            </div>
-        </div>
-        
-        <div class="print-chart">
-            <h3>Visitor Trends</h3>
-            <canvas id="printVisitorChart" width="800" height="400"></canvas>
-        </div>
-        
-        <table class="print-table" id="printVisitorsTable">
-            <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Visitors</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
-    </div>
+    
 
     <div class="flex justify-end mb-6 no-print">
         <span id="datetime" class="text-gray-600"></span>
