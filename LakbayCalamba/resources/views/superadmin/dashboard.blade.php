@@ -139,7 +139,7 @@
     <!-- Visitor Trends Chart -->
     <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
         <div class="flex items-center justify-between mb-4">
-            <h3 class="text-lg font-semibold text-gray-800">Visitor Trends (Last 7 Days)</h3>
+            <h3 class="text-lg font-semibold text-gray-800">{{ $visitorTrendsTitle ?? 'Visitor Trends' }}</h3>
         </div>
         <div class="h-64 bg-gray-50 rounded-lg p-4">
             <canvas id="visitorTrendsChart"></canvas>

@@ -18,6 +18,10 @@ class SuperAdminController extends Controller
         // Handle custom date range from request
         $startDate = $request->get('start_date') ? Carbon::parse($request->get('start_date'))->startOfDay() : $now->copy()->startOfMonth();
         $endDate = $request->get('end_date') ? Carbon::parse($request->get('end_date'))->endOfDay() : $now->copy()->endOfDay();
+        // Ensure startDate is not after endDate; if so, swap
+        if ($startDate->gt($endDate)) {
+            [$startDate, $endDate] = [$endDate->copy()->startOfDay(), $startDate->copy()->endOfDay()];
+        }
         
         // Calculate date ranges
         $today = $now->copy()->startOfDay();
@@ -109,17 +113,22 @@ class SuperAdminController extends Controller
             $establishment->custom_range_visitors = $establishment->custom_range_stamps + $establishment->custom_range_guests;
         }
         
-        // Get visitor trends for the last 7 days for chart data (stamps + guests)
+        // Get visitor trends for the selected range (inclusive), grouped by day (stamps + guests)
         $visitorTrends = [];
-        for ($i = 6; $i >= 0; $i--) {
-            $date = $now->copy()->subDays($i)->startOfDay();
-            $stampCount = \App\Models\Stamp::whereDate('visit_date', $date)->count();
-            $guestCount = \App\Models\Visitor::where('is_guest', true)->whereDate('visited_at', $date)->count();
+        $cursorDate = $startDate->copy()->startOfDay();
+        $endOfRange = $endDate->copy()->endOfDay();
+        while ($cursorDate->lte($endOfRange)) {
+            $stampCount = \App\Models\Stamp::whereDate('visit_date', $cursorDate)->count();
+            $guestCount = \App\Models\Visitor::where('is_guest', true)->whereDate('visited_at', $cursorDate)->count();
             $visitorTrends[] = [
-                'date' => $date->format('M d'),
+                'date' => $cursorDate->format('M d'),
                 'visitors' => $stampCount + $guestCount
             ];
+            $cursorDate->addDay();
         }
+
+        // Chart title to reflect range
+        $visitorTrendsTitle = 'Visitor Trends (' . $startDate->format('M d, Y') . ' - ' . $endDate->format('M d, Y') . ')';
         
         return view('superadmin.dashboard', compact(
             'todayVisitors',
@@ -138,7 +147,8 @@ class SuperAdminController extends Controller
             'establishmentStats',
             'visitorTrends',
             'startDate',
-            'endDate'
+            'endDate',
+            'visitorTrendsTitle'
         ));
     }
 
