@@ -11,7 +11,7 @@
         <x-profilecard
             name="{{ auth()->user()->name }}"
             lakbayId="{{ auth()->user()->lakbay_id }}"
-            backgroundUrl="{{ asset('images/profilecardtemp.png') }}"
+            backgroundUrl="{{ url('images/profilecardtemp.png') }}"
         />
         <br>
         

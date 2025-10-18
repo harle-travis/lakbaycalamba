@@ -3,7 +3,7 @@
     <!-- Logo / Brand -->
     <div class="flex items-center space-x-2">
         <a href="{{ route('home') }}" class="cursor-pointer hover:opacity-80 transition-opacity">
-            <img src="{{ asset('images/header_logo.png') }}" alt="Lakbay Calamba Logo" class="h-8 sm:h-10 md:h-12 w-auto">
+            <img src="{{ url('images/header_logo.png') }}" alt="Lakbay Calamba Logo" class="h-8 sm:h-10 md:h-12 w-auto">
         </a>
     </div>
     

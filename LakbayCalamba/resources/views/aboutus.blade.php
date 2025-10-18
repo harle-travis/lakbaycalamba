@@ -6,7 +6,7 @@
 <!-- Hero Section -->
 <div class="relative bg-gradient-to-br from-blue-500 to-blue-600 min-h-[50vh] sm:min-h-[60vh] flex items-center rounded-2xl mx-4 sm:mx-6">
     <!-- Background Image -->
-    <img src="{{ asset('images/jose_rizal.png') }}" alt="Jose Rizal" class="absolute inset-0 w-full h-full object-cover opacity-30 select-none pointer-events-none" style="object-position: center 15%;" />
+    <img src="{{ url('images/jose_rizal.png') }}" alt="Jose Rizal" class="absolute inset-0 w-full h-full object-cover opacity-30 select-none pointer-events-none" style="object-position: center 15%;" />
     
     <!-- Content -->
     <div class="relative z-10 container mx-auto px-4 py-10 sm:py-12">
@@ -121,7 +121,7 @@
             </div>
             <div class="w-full">
                 <div class="rounded-2xl shadow-md overflow-hidden border border-gray-200">
-                    <img src="{{ asset('images/calambamap.png') }}" alt="Calamba map" class="w-full h-56 sm:h-72 md:h-80 object-cover" />
+                    <img src="{{ url('images/calambamap.png') }}" alt="Calamba map" class="w-full h-56 sm:h-72 md:h-80 object-cover" />
                 </div>
             </div>
         </div>

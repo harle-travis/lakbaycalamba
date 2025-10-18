@@ -4,7 +4,7 @@
         <!-- City Banner & Description -->
         <div>
             <a href="{{ route('home') }}" class="cursor-pointer hover:opacity-80 transition-opacity">
-                <img src="{{ asset('images/calamba_logo.webp') }}" alt="Republic of the Philippines - City of Calamba" class="mb-2 h-8 sm:h-10 md:h-12 w-auto">
+                <img src="{{ url('images/calamba_logo.webp') }}" alt="Republic of the Philippines - City of Calamba" class="mb-2 h-8 sm:h-10 md:h-12 w-auto">
             </a>
             <p class="text-sm leading-relaxed text-justify">
                 Calamba, officially known as the City of Calamba, is a 1st class component city in the province of

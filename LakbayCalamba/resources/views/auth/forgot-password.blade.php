@@ -87,7 +87,7 @@
             <div class="max-w-md px-8 text-center">
                 <div class="flex justify-center mb-8">
                     <a href="{{ route('home') }}" class="cursor-pointer hover:opacity-80 transition-opacity">
-                        <img src="{{ asset('images/mainlogo.png') }}" alt="Lakbay Calamba" class="w-72 md:w-96 h-auto">
+                        <img src="{{ url('images/mainlogo.png') }}" alt="Lakbay Calamba" class="w-72 md:w-96 h-auto">
                     </a>
                 </div>
                 <p class="text-gray-600 leading-relaxed">Forgot your password? No worries! Enter your email address and we'll send you a link to reset it.</p>
@@ -100,7 +100,7 @@
                 <!-- Mobile Logo -->
                 <div class="lg:hidden flex justify-center mb-6">
                     <a href="{{ route('home') }}" class="cursor-pointer hover:opacity-80 transition-opacity">
-                        <img src="{{ asset('images/mainlogo.png') }}" alt="Lakbay Calamba" class="w-40 sm:w-56 h-auto">
+                        <img src="{{ url('images/mainlogo.png') }}" alt="Lakbay Calamba" class="w-40 sm:w-56 h-auto">
                     </a>
                 </div>
 
