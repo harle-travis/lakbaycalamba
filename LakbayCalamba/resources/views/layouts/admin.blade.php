@@ -17,7 +17,7 @@
         <!-- Logo Section -->
         <div class="px-6 py-4 flex items-center justify-center border-b border-gray-200">
             <a href="{{ route('home') }}" class="cursor-pointer hover:opacity-80 transition-opacity">
-                <img src="{{ url('images/header_logo.png') }}" alt="Lakbay Calamba Logo" class="h-12 w-auto">
+                <img src="/images/header_logo.png" alt="Lakbay Calamba Logo" class="h-12 w-auto">
             </a>
         </div>
 

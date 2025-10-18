@@ -52,7 +52,7 @@ return [
     |
     */
 
-    'url' => env('APP_URL', 'http://localhost'),
+    'url' => env('APP_URL', 'https://bisque-sheep-757394.hostingersite.com'),
 
     /*
     |--------------------------------------------------------------------------
