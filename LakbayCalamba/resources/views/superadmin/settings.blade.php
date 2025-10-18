@@ -49,13 +49,13 @@
                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                 </div>
                 <div>
-                    <label for="new_password" class="block text-sm font-medium text-gray-700 mb-2">New Password</label>
-                    <input type="password" id="new_password" name="new_password" required 
+                    <label for="password" class="block text-sm font-medium text-gray-700 mb-2">New Password</label>
+                    <input type="password" id="password" name="password" required 
                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                 </div>
                 <div>
-                    <label for="new_password_confirmation" class="block text-sm font-medium text-gray-700 mb-2">Confirm New Password</label>
-                    <input type="password" id="new_password_confirmation" name="new_password_confirmation" required 
+                    <label for="password_confirmation" class="block text-sm font-medium text-gray-700 mb-2">Confirm New Password</label>
+                    <input type="password" id="password_confirmation" name="password_confirmation" required 
                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                 </div>
                 <div>

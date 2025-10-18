@@ -19,6 +19,14 @@
             <a href="{{ route('aboutus') }}" class="text-gray-800 font-medium hover:text-blue-600 transition">About</a>
             <a href="{{ route('weather') }}" class="text-gray-800 font-medium hover:text-blue-600 transition">Weather</a>
             <a href="{{ route('leaderboard') }}" class="text-gray-800 font-medium hover:text-blue-600 transition">Leaderboard</a>
+            
+            @auth
+                @if(auth()->user()->role === 'superadmin')
+                    <a href="{{ route('superadmin.dashboard') }}" class="text-white font-medium bg-red-600 px-3 py-1 rounded-md hover:bg-red-700 transition">Superadmin Dashboard</a>
+                @elseif(auth()->user()->role === 'admin')
+                    <a href="{{ route('admin.dash') }}" class="text-white font-medium bg-green-600 px-3 py-1 rounded-md hover:bg-green-700 transition">Admin Dashboard</a>
+                @endif
+            @endauth
         </nav>
         
         <!-- Action Buttons -->
@@ -52,6 +60,14 @@
                 <a href="{{ route('aboutus') }}" class="px-3 py-2 rounded-md hover:bg-gray-50 text-gray-800 font-medium">About</a>
                 <a href="{{ route('weather') }}" class="px-3 py-2 rounded-md hover:bg-gray-50 text-gray-800 font-medium">Weather</a>
                 <a href="{{ route('leaderboard') }}" class="px-3 py-2 rounded-md hover:bg-gray-50 text-gray-800 font-medium">Leaderboard</a>
+                
+                @auth
+                    @if(auth()->user()->role === 'superadmin')
+                        <a href="{{ route('superadmin.dashboard') }}" class="px-3 py-2 rounded-md hover:bg-red-50 text-white font-medium bg-red-600 hover:bg-red-700 transition">Superadmin Dashboard</a>
+                    @elseif(auth()->user()->role === 'admin')
+                        <a href="{{ route('admin.dash') }}" class="px-3 py-2 rounded-md hover:bg-green-50 text-white font-medium bg-green-600 hover:bg-green-700 transition">Admin Dashboard</a>
+                    @endif
+                @endauth
             </div>
             <div class="h-px bg-gray-200"></div>
             <div class="flex flex-wrap gap-2">
