@@ -137,11 +137,6 @@
     <div class="flex justify-between items-center bg-white px-6 py-6 shadow-sm border-b border-gray-200">
         <div></div>
         <div class="flex items-center space-x-6">
-            <!-- Email Icon -->
-            <i data-lucide="mail" class="w-6 h-6 text-blue-600 cursor-pointer"></i>
-
-            <!-- Notification Icon -->
-            <i data-lucide="bell" class="w-6 h-6 text-blue-600 cursor-pointer"></i>
         </div>
     </div>
 

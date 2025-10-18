@@ -36,18 +36,6 @@
                 </div>
                 
                 <div class="flex items-center space-x-4 h-12">
-                    
-                    <!-- Notifications -->
-                    <button class="relative p-2 text-gray-600 hover:text-blue-600 transition-colors duration-300">
-                        <i data-lucide="bell" class="w-5 h-5"></i>
-                        <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">3</span>
-                    </button>
-                    
-                    <!-- Messages -->
-                    <button class="relative p-2 text-gray-600 hover:text-blue-600 transition-colors duration-300">
-                        <i data-lucide="mail" class="w-5 h-5"></i>
-                        <span class="absolute -top-1 -right-1 bg-blue-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">5</span>
-                    </button>
                 </div>
             </div>
         </header>
