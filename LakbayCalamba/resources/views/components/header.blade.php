@@ -22,9 +22,9 @@
             
             @auth
                 @if(auth()->user()->role === 'superadmin')
-                    <a href="{{ route('superadmin.dashboard') }}" class="text-white font-medium bg-red-600 px-3 py-1 rounded-md hover:bg-red-700 transition">Superadmin Dashboard</a>
+                    <a href="{{ route('superadmin.dashboard') }}" class="text-white font-medium bg-blue-600 px-3 py-1 rounded-md hover:bg-blue-700 transition">Superadmin Dashboard</a>
                 @elseif(auth()->user()->role === 'admin')
-                    <a href="{{ route('admin.dash') }}" class="text-white font-medium bg-green-600 px-3 py-1 rounded-md hover:bg-green-700 transition">Admin Dashboard</a>
+                    <a href="{{ route('admin.dash') }}" class="text-white font-medium bg-blue-600 px-3 py-1 rounded-md hover:bg-blue-700 transition">Admin Dashboard</a>
                 @endif
             @endauth
         </nav>
@@ -36,20 +36,35 @@
                 <a href="{{ route('login') }}" class="hidden sm:inline-flex px-3 py-2 sm:px-4 rounded-lg bg-blue-600 text-white text-sm sm:text-base font-medium hover:bg-blue-700 transition">Sign In</a>
             @endguest
             @auth
-                <a href="{{ route('e-stamps') }}" class="hidden sm:inline-flex px-3 py-2 sm:px-4 rounded-lg bg-blue-100 text-blue-800 text-sm sm:text-base font-medium hover:bg-blue-200 transition">My E-Stamps</a>
-                <div class="relative hidden sm:block">
-                    <button id="user-menu-button" type="button" class="px-3 py-2 sm:px-4 rounded-lg bg-gray-100 text-gray-800 text-sm sm:text-base font-medium hover:bg-gray-200 transition flex items-center gap-2">
-                        <span>{{ auth()->user()->name }}</span>
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.25 8.29a.75.75 0 01-.02-1.08z" clip-rule="evenodd"/></svg>
-                    </button>
-                    <div id="user-menu" class="hidden absolute right-0 mt-2 w-40 bg-white border border-gray-200 rounded-lg shadow-lg py-1 z-50">
-                        <a href="{{ route('settings') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Settings</a>
-                        <a href="#" onclick="event.preventDefault(); if(confirm('Are you sure you want to sign out?')) document.getElementById('logout-form').submit();" class="block px-4 py-2 text-sm text-red-600 hover:bg-red-50">Sign Out</a>
-                        <form id="logout-form" action="{{ route('logout') }}" method="POST" class="hidden">
+                @if(auth()->user()->role !== 'admin' && auth()->user()->role !== 'superadmin')
+                    <a href="{{ route('e-stamps') }}" class="hidden sm:inline-flex px-3 py-2 sm:px-4 rounded-lg bg-blue-100 text-blue-800 text-sm sm:text-base font-medium hover:bg-blue-200 transition">My E-Stamps</a>
+                @endif
+                
+                @if(auth()->user()->role !== 'admin' && auth()->user()->role !== 'superadmin')
+                    <div class="relative hidden sm:block">
+                        <button id="user-menu-button" type="button" class="px-3 py-2 sm:px-4 rounded-lg bg-gray-100 text-gray-800 text-sm sm:text-base font-medium hover:bg-gray-200 transition flex items-center gap-2">
+                            <span>{{ auth()->user()->name }}</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.25 8.29a.75.75 0 01-.02-1.08z" clip-rule="evenodd"/></svg>
+                        </button>
+                        <div id="user-menu" class="hidden absolute right-0 mt-2 w-40 bg-white border border-gray-200 rounded-lg shadow-lg py-1 z-50">
+                            <a href="{{ route('settings') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Settings</a>
+                            <a href="#" onclick="event.preventDefault(); if(confirm('Are you sure you want to sign out?')) document.getElementById('logout-form').submit();" class="block px-4 py-2 text-sm text-red-600 hover:bg-red-50">Sign Out</a>
+                            <form id="logout-form" action="{{ route('logout') }}" method="POST" class="hidden">
+                                @csrf
+                            </form>
+                        </div>
+                    </div>
+                @else
+                    <!-- Simple logout button for admin/superadmin -->
+                    <div class="hidden sm:block">
+                        <a href="#" onclick="event.preventDefault(); if(confirm('Are you sure you want to sign out?')) document.getElementById('logout-form-admin').submit();" class="px-3 py-2 sm:px-4 rounded-lg bg-gray-100 text-gray-800 text-sm sm:text-base font-medium hover:bg-gray-200 transition">
+                            {{ auth()->user()->name }} - Sign Out
+                        </a>
+                        <form id="logout-form-admin" action="{{ route('logout') }}" method="POST" class="hidden">
                             @csrf
                         </form>
                     </div>
-                </div>
+                @endif
             @endauth
         </div>
     </div>
@@ -63,9 +78,9 @@
                 
                 @auth
                     @if(auth()->user()->role === 'superadmin')
-                        <a href="{{ route('superadmin.dashboard') }}" class="px-3 py-2 rounded-md hover:bg-red-50 text-white font-medium bg-red-600 hover:bg-red-700 transition">Superadmin Dashboard</a>
+                        <a href="{{ route('superadmin.dashboard') }}" class="px-3 py-2 rounded-md hover:bg-blue-50 text-white font-medium bg-blue-600 hover:bg-blue-700 transition">Superadmin Dashboard</a>
                     @elseif(auth()->user()->role === 'admin')
-                        <a href="{{ route('admin.dash') }}" class="px-3 py-2 rounded-md hover:bg-green-50 text-white font-medium bg-green-600 hover:bg-green-700 transition">Admin Dashboard</a>
+                        <a href="{{ route('admin.dash') }}" class="px-3 py-2 rounded-md hover:bg-blue-50 text-white font-medium bg-blue-600 hover:bg-blue-700 transition">Admin Dashboard</a>
                     @endif
                 @endauth
             </div>
@@ -76,8 +91,10 @@
                     <a href="{{ route('login') }}" class="w-full text-center px-3 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition">Sign In</a>
                 @endguest
                 @auth
-                    <a href="{{ route('e-stamps') }}" class="w-full text-center px-3 py-2 rounded-lg bg-blue-100 text-blue-800 text-sm font-medium hover:bg-blue-200 transition">My E-Stamps</a>
-                    <a href="{{ route('settings') }}" class="w-full text-center px-3 py-2 rounded-lg bg-gray-100 text-gray-800 text-sm font-medium hover:bg-gray-200 transition">Settings</a>
+                    @if(auth()->user()->role !== 'admin' && auth()->user()->role !== 'superadmin')
+                        <a href="{{ route('e-stamps') }}" class="w-full text-center px-3 py-2 rounded-lg bg-blue-100 text-blue-800 text-sm font-medium hover:bg-blue-200 transition">My E-Stamps</a>
+                        <a href="{{ route('settings') }}" class="w-full text-center px-3 py-2 rounded-lg bg-gray-100 text-gray-800 text-sm font-medium hover:bg-gray-200 transition">Settings</a>
+                    @endif
                     <a href="#" onclick="event.preventDefault(); if(confirm('Are you sure you want to sign out?')) document.getElementById('logout-form-mobile').submit();" class="w-full text-center px-3 py-2 rounded-lg bg-red-600 text-white text-sm font-medium hover:bg-red-700 transition">Sign Out</a>
                     <form id="logout-form-mobile" action="{{ route('logout') }}" method="POST" class="hidden">
                         @csrf
