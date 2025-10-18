@@ -3,6 +3,43 @@
 @section('title', 'Home')
 
 @section('content')
+<!-- Featured Images Section -->
+<div class="container mx-auto px-4 py-8">
+    <div class="bg-white rounded-xl shadow-lg overflow-hidden mb-8">
+        <div class="flex flex-col lg:flex-row">
+            <!-- Thumbnails Section (Left Side) -->
+            <div class="lg:w-1/4 p-4 bg-gray-50">
+                <div class="space-y-3">
+                    <div class="aspect-square bg-gray-200 rounded-lg overflow-hidden cursor-pointer hover:opacity-80 transition-opacity" onclick="showFeaturedImage(0)">
+                        <img src="{{ url('images/calambamap.png') }}" alt="Calamba Map" class="w-full h-full object-cover">
+                    </div>
+                    <div class="aspect-square bg-gray-200 rounded-lg overflow-hidden cursor-pointer hover:opacity-80 transition-opacity" onclick="showFeaturedImage(1)">
+                        <img src="{{ url('images/jose_rizal.png') }}" alt="Jose Rizal" class="w-full h-full object-cover">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Main Image Section -->
+            <div class="lg:w-3/4 relative">
+                <div class="featured-image-container relative h-64 sm:h-80 lg:h-96">
+                    <div class="featured-slide active absolute inset-0 transition-opacity duration-500">
+                        <img src="{{ url('images/calambamap.png') }}" alt="Calamba Map" class="w-full h-full object-cover">
+                    </div>
+                    <div class="featured-slide absolute inset-0 transition-opacity duration-500 opacity-0">
+                        <img src="{{ url('images/jose_rizal.png') }}" alt="Jose Rizal" class="w-full h-full object-cover">
+                    </div>
+                    
+                    <!-- Image Overlay with Title -->
+                    <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-6">
+                        <h2 class="text-white text-xl sm:text-2xl font-bold mb-2">SM City Calamba</h2>
+                        <p class="text-white/90 text-sm sm:text-base">Discover the vibrant shopping and entertainment hub of Calamba City</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="flex flex-col items-center justify-center min-h-70 pt-16 sm:pt-20 px-4 w-full">
     <h1 class="text-2xl sm:text-3xl font-bold text-center mb-4">Which Calamba Spot Will You Discover Today?</h1>
     
@@ -107,6 +144,62 @@ document.addEventListener('DOMContentLoaded', function() {
         clearTimeout(searchTimeout);
         searchTimeout = setTimeout(applyFilters, 1000); // 1 second delay
     });
+});
+
+// Featured Images functionality
+function showFeaturedImage(index) {
+    const slides = document.querySelectorAll('.featured-slide');
+    const thumbnails = document.querySelectorAll('.aspect-square');
+    
+    // Hide all slides
+    slides.forEach(slide => {
+        slide.classList.remove('active');
+        slide.style.opacity = '0';
+    });
+    
+    // Show selected slide
+    slides[index].classList.add('active');
+    slides[index].style.opacity = '1';
+    
+    // Update thumbnail borders/selection
+    thumbnails.forEach((thumb, i) => {
+        thumb.classList.remove('ring-2', 'ring-blue-500');
+        if (i === index) {
+            thumb.classList.add('ring-2', 'ring-blue-500');
+        }
+    });
+}
+
+// Auto-play for featured images
+let featuredImageInterval;
+function startFeaturedImageAutoPlay() {
+    featuredImageInterval = setInterval(() => {
+        const currentActive = document.querySelector('.featured-slide.active');
+        const slides = document.querySelectorAll('.featured-slide');
+        const currentIndex = Array.from(slides).indexOf(currentActive);
+        const nextIndex = (currentIndex + 1) % slides.length;
+        showFeaturedImage(nextIndex);
+    }, 5000); // Change every 5 seconds
+}
+
+// Pause auto-play on hover
+document.addEventListener('DOMContentLoaded', function() {
+    const featuredContainer = document.querySelector('.featured-image-container');
+    if (featuredContainer) {
+        featuredContainer.addEventListener('mouseenter', () => {
+            clearInterval(featuredImageInterval);
+        });
+        
+        featuredContainer.addEventListener('mouseleave', () => {
+            startFeaturedImageAutoPlay();
+        });
+        
+        // Start auto-play
+        startFeaturedImageAutoPlay();
+        
+        // Set initial thumbnail selection
+        showFeaturedImage(0);
+    }
 });
 </script>
     
