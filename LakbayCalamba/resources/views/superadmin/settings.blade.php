@@ -68,6 +68,19 @@
             <div id="passwordMessage" class="mt-4 hidden"></div>
         </div>
     </div>
+
+    <!-- Success/Error Messages -->
+    @if(session('success'))
+        <div class="mt-6 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg">
+            {{ session('success') }}
+        </div>
+    @endif
+
+    @if(session('error'))
+        <div class="mt-6 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg">
+            {{ session('error') }}
+        </div>
+    @endif
 </div>
 
 <script>
@@ -111,7 +124,7 @@ document.getElementById('changePasswordForm').addEventListener('submit', functio
     const formData = new FormData(this);
     const messageDiv = document.getElementById('passwordMessage');
     
-    fetch('{{ route("superadmin.change-password") }}', {
+    fetch('{{ route("superadmin.update-password") }}', {
         method: 'POST',
         body: formData,
         headers: {

@@ -6,6 +6,9 @@ use Illuminate\Http\Request;
 use App\Models\Establishment;
 use App\Models\Visitor;
 use App\Models\User;
+use App\Models\EmailConfirmation;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Carbon\Carbon;
 
 class SuperAdminController extends Controller
@@ -335,13 +338,148 @@ class SuperAdminController extends Controller
             'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
         ]);
 
-        $user->email = $validated['email'];
-        $user->save();
+        // If email is changing, require email confirmation
+        if ($validated['email'] !== $user->email) {
+            // Create email confirmation
+            $confirmation = EmailConfirmation::createConfirmation(
+                $user->id,
+                EmailConfirmation::TYPE_EMAIL_CHANGE,
+                $validated['email']
+            );
+
+            // Send confirmation email
+            $confirmationUrl = route('email.confirm', ['token' => $confirmation->token]);
+            
+            try {
+                Mail::send('emails.email-change-confirmation', [
+                    'user' => $user,
+                    'newEmail' => $validated['email'],
+                    'confirmationUrl' => $confirmationUrl
+                ], function ($message) use ($user) {
+                    $message->to($user->email, $user->name)
+                            ->subject('Confirm Email Change - Lakbay Calamba');
+                });
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Please check your email to confirm the email address change.',
+                    'requires_confirmation' => true,
+                ]);
+            } catch (\Exception $e) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed to send email confirmation. Please try again.',
+                ], 500);
+            }
+        }
 
         return response()->json([
             'success' => true,
             'message' => 'Email updated successfully.',
             'email' => $user->email,
         ]);
+    }
+
+    /**
+     * Update password for superadmin/admin with email confirmation
+     */
+    public function updatePassword(Request $request)
+    {
+        $user = auth()->user();
+
+        $validated = $request->validate([
+            'current_password' => 'required',
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+
+        // Check if current password is correct
+        if (!Hash::check($validated['current_password'], $user->password)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Current password is incorrect.',
+            ], 422);
+        }
+
+        // Create password change confirmation
+        $confirmation = EmailConfirmation::createConfirmation(
+            $user->id,
+            EmailConfirmation::TYPE_PASSWORD_CHANGE,
+            null,
+            Hash::make($validated['password'])
+        );
+
+        // Send confirmation email
+        $confirmationUrl = route('password.confirm', ['token' => $confirmation->token]);
+        
+        try {
+            Mail::send('emails.password-change-confirmation', [
+                'user' => $user,
+                'confirmationUrl' => $confirmationUrl
+            ], function ($message) use ($user) {
+                $message->to($user->email, $user->name)
+                        ->subject('Confirm Password Change - Lakbay Calamba');
+            });
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Please check your email to confirm the password change. Your current password remains active until confirmed.',
+                'requires_confirmation' => true,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to send password confirmation email. Please try again.',
+            ], 500);
+        }
+    }
+
+    /**
+     * Handle email confirmation for email changes
+     */
+    public function confirmEmailChange(Request $request, $token)
+    {
+        $confirmation = EmailConfirmation::where('token', $token)
+            ->where('type', EmailConfirmation::TYPE_EMAIL_CHANGE)
+            ->first();
+
+        if (!$confirmation || !$confirmation->isValid()) {
+            return redirect()->route('superadmin.settings')->with('error', 
+                'Invalid or expired confirmation link. Please request a new email change.');
+        }
+
+        // Update user email
+        $user = $confirmation->user;
+        $user->update(['email' => $confirmation->new_email]);
+        
+        // Mark confirmation as confirmed
+        $confirmation->confirm();
+
+        return redirect()->route('superadmin.settings')->with('success', 
+            'Email address has been successfully updated!');
+    }
+
+    /**
+     * Handle email confirmation for password changes
+     */
+    public function confirmPasswordChange(Request $request, $token)
+    {
+        $confirmation = EmailConfirmation::where('token', $token)
+            ->where('type', EmailConfirmation::TYPE_PASSWORD_CHANGE)
+            ->first();
+
+        if (!$confirmation || !$confirmation->isValid()) {
+            return redirect()->route('superadmin.settings')->with('error', 
+                'Invalid or expired confirmation link. Please request a new password change.');
+        }
+
+        // Update user password
+        $user = $confirmation->user;
+        $user->update(['password' => $confirmation->new_password_hash]);
+        
+        // Mark confirmation as confirmed
+        $confirmation->confirm();
+
+        return redirect()->route('superadmin.settings')->with('success', 
+            'Password has been successfully updated!');
     }
 }

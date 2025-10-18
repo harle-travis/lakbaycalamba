@@ -81,6 +81,14 @@ Route::middleware('auth')->group(function () {
     Route::get('/settings', [App\Http\Controllers\UserController::class, 'showSettings'])->name('settings');
     Route::put('/settings/profile', [App\Http\Controllers\UserController::class, 'updateProfile'])->name('settings.profile');
     Route::put('/settings/password', [App\Http\Controllers\UserController::class, 'updatePassword'])->name('settings.password');
+    
+    // Email confirmation routes
+    Route::get('/email/confirm/{token}', [App\Http\Controllers\UserController::class, 'confirmEmailChange'])
+        ->middleware('email.confirmation')
+        ->name('email.confirm');
+    Route::get('/password/confirm/{token}', [App\Http\Controllers\UserController::class, 'confirmPasswordChange'])
+        ->middleware('email.confirmation')
+        ->name('password.confirm');
 });
 
 // Admin-only
@@ -120,6 +128,13 @@ Route::middleware(['auth', 'role:superadmin'])->prefix('superadmin')->name('supe
                 Route::view('/settings', 'superadmin.settings')->name('settings');
                 Route::post('/change-password', [App\Http\Controllers\AdminController::class, 'changePassword'])->name('change-password');
                 Route::post('/update-email', [App\Http\Controllers\SuperAdminController::class, 'updateEmail'])->name('update-email');
+                Route::post('/update-password', [App\Http\Controllers\SuperAdminController::class, 'updatePassword'])->name('update-password');
+                Route::get('/email/confirm/{token}', [App\Http\Controllers\SuperAdminController::class, 'confirmEmailChange'])
+                    ->middleware('email.confirmation')
+                    ->name('email.confirm');
+                Route::get('/password/confirm/{token}', [App\Http\Controllers\SuperAdminController::class, 'confirmPasswordChange'])
+                    ->middleware('email.confirmation')
+                    ->name('password.confirm');
                 
                 // Tourist management routes
                 Route::get('/manage-tourists', [TouristController::class, 'index'])->name('manage-tourists');
