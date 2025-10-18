@@ -1,7 +1,7 @@
 @props(['establishment'])
 
-<div class="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 p-4 w-full max-w-sm mx-auto" data-establishment-id="{{ $establishment->id }}">
-    <a href="{{ route('establishment.show', $establishment) }}" class="block bg-gray-200 rounded-lg h-48 mb-4 flex items-center justify-center hover:opacity-90 transition-opacity overflow-hidden">
+<div class="bg-white rounded-xl shadow p-4 w-80" data-establishment-id="{{ $establishment->id }}">
+    <a href="{{ route('establishment.show', $establishment) }}" class="block bg-gray-200 rounded-lg h-40 mb-4 flex items-center justify-center hover:opacity-90 transition-opacity overflow-hidden">
         @if($establishment->pictures->count() > 0)
             <img src="{{ asset('storage/' . $establishment->pictures->first()->image_path) }}" alt="{{ $establishment->establishment_name }}" class="object-cover h-full w-full rounded-lg">
         @else
