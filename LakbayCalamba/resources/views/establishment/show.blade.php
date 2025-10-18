@@ -16,78 +16,22 @@
         <!-- Image Gallery -->
         <div class="mb-8">
             @if($establishment->pictures->count() > 0)
-                <div class="flex flex-col lg:flex-row gap-6">
-                    <!-- Main Image -->
-                    <div class="lg:w-3/4">
-                        <img id="mainImage"
-                             src="{{ url('storage/' . $establishment->pictures->first()->image_path) }}"
-                             alt="{{ $establishment->establishment_name }}"
-                             class="w-full h-auto max-h-96 object-contain rounded-lg shadow-lg cursor-pointer hover:opacity-90 transition-opacity bg-gray-100"
-                             onclick="openImageViewer(0)">
-                    </div>
-                    
-                    <!-- Thumbnail Carousel -->
-                    <div class="lg:w-1/4">
-                        <div class="bg-gray-50 rounded-lg p-4">
-                            <h3 class="text-lg font-semibold mb-4 text-gray-800">Gallery</h3>
-                            
-                            @if($establishment->pictures->count() > 1)
-                                <!-- Thumbnail Carousel Container -->
-                                <div class="relative">
-                                    <!-- Navigation Arrows -->
-                                    <button onclick="scrollThumbnails('left')" 
-                                            class="absolute left-0 top-1/2 transform -translate-y-1/2 bg-white rounded-full p-2 shadow-md hover:shadow-lg transition-shadow z-10">
-                                        <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
-                                        </svg>
-                                    </button>
-                                    
-                                    <button onclick="scrollThumbnails('right')" 
-                                            class="absolute right-0 top-1/2 transform -translate-y-1/2 bg-white rounded-full p-2 shadow-md hover:shadow-lg transition-shadow z-10">
-                                        <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
-                                        </svg>
-                                    </button>
-                                    
-                                    <!-- Thumbnail Container -->
-                                    <div class="thumbnail-container overflow-hidden mx-8">
-                                        <div class="thumbnail-track flex transition-transform duration-300 ease-in-out" id="thumbnailTrack">
-                                            @foreach($establishment->pictures as $index => $picture)
-                                                <div class="thumbnail-item flex-shrink-0 mr-3">
-                                                    <img src="{{ url('storage/' . $picture->image_path) }}"
-                                                         alt="{{ $establishment->establishment_name }}"
-                                                         class="w-20 h-20 object-cover rounded-lg cursor-pointer hover:opacity-80 transition-opacity {{ $index === 0 ? 'ring-2 ring-blue-500' : '' }}"
-                                                         onclick="changeMainImage({{ $index }})"
-                                                         data-index="{{ $index }}">
-                                                </div>
-                                            @endforeach
-                                        </div>
-                                    </div>
-                                    
-                                    <!-- Pagination Dots -->
-                                    @if($establishment->pictures->count() > 4)
-                                        <div class="flex justify-center mt-4 space-x-2">
-                                            @for($i = 0; $i < ceil($establishment->pictures->count() / 4); $i++)
-                                                <button onclick="goToThumbnailPage({{ $i }})" 
-                                                        class="thumbnail-dot w-2 h-2 rounded-full {{ $i === 0 ? 'bg-blue-500' : 'bg-gray-300' }} transition-colors duration-200"
-                                                        data-page="{{ $i }}">
-                                                </button>
-                                            @endfor
-                                        </div>
-                                    @endif
-                                </div>
-                            @else
-                                <!-- Single Image Display -->
-                                <div class="flex justify-center">
-                                    <img src="{{ url('storage/' . $establishment->pictures->first()->image_path) }}"
-                                         alt="{{ $establishment->establishment_name }}"
-                                         class="w-20 h-20 object-cover rounded-lg cursor-pointer hover:opacity-80 transition-opacity ring-2 ring-blue-500"
-                                         onclick="openImageViewer(0)">
-                                </div>
-                            @endif
-                        </div>
-                    </div>
+                <!-- Main Image -->
+                <div class="mb-4">
+                    <img id="mainImage"
+                                 src="{{ url('storage/' . $establishment->pictures->first()->image_path) }}"
+                                 alt="{{ $establishment->establishment_name }}"
+                                 class="w-full h-auto max-h-96 object-contain rounded-lg shadow-lg cursor-pointer hover:opacity-90 transition-opacity bg-gray-100"
+                                 onclick="openImageViewer(0)">
                 </div>
+                
+                <!-- Thumbnail Images -->
+                @foreach($establishment->pictures as $index => $picture)
+                     <img src="{{ url('storage/' . $picture->image_path) }}"
+                                  alt="{{ $establishment->establishment_name }}"
+                                  class="w-24 h-24 object-cover rounded-lg cursor-pointer hover:opacity-80 transition-opacity flex-shrink-0"
+                                    onclick="openImageViewer({{ $index }})">
+                @endforeach
 
             @else
                 <div class="w-full h-96 bg-gray-200 rounded-lg flex items-center justify-center">
@@ -365,70 +309,9 @@ let currentFilter = 'all';
 let currentSort = 'newest';
 let selectedRating = 0;
 
-// Thumbnail carousel functionality
-let currentThumbnailPage = 0;
-const thumbnailsPerPage = 4;
-
-function changeMainImage(index) {
-    const mainImage = document.getElementById('mainImage');
-    const pictures = @json($establishment->pictures);
-    
-    if (pictures[index]) {
-        mainImage.src = "{{ url('storage/') }}/" + pictures[index].image_path;
-        
-        // Update thumbnail selection
-        document.querySelectorAll('.thumbnail-item img').forEach((img, i) => {
-            img.classList.remove('ring-2', 'ring-blue-500');
-            if (i === index) {
-                img.classList.add('ring-2', 'ring-blue-500');
-            }
-        });
-        
-        // Update modal viewer if open
-        if (typeof openImageViewer === 'function') {
-            openImageViewer(index);
-        }
-    }
+function changeMainImage(src) {
+    document.getElementById('mainImage').src = src;
 }
-
-function scrollThumbnails(direction) {
-    const track = document.getElementById('thumbnailTrack');
-    const totalThumbnails = {{ $establishment->pictures->count() }};
-    const totalPages = Math.ceil(totalThumbnails / thumbnailsPerPage);
-    
-    if (direction === 'left') {
-        currentThumbnailPage = Math.max(0, currentThumbnailPage - 1);
-    } else {
-        currentThumbnailPage = Math.min(totalPages - 1, currentThumbnailPage + 1);
-    }
-    
-    const translateX = -(currentThumbnailPage * thumbnailsPerPage * 92); // 80px width + 12px margin
-    track.style.transform = `translateX(${translateX}px)`;
-    
-    // Update pagination dots
-    updatePaginationDots();
-}
-
-function goToThumbnailPage(page) {
-    currentThumbnailPage = page;
-    const track = document.getElementById('thumbnailTrack');
-    const translateX = -(page * thumbnailsPerPage * 92);
-    track.style.transform = `translateX(${translateX}px)`;
-    
-    updatePaginationDots();
-}
-
-function updatePaginationDots() {
-    document.querySelectorAll('.thumbnail-dot').forEach((dot, index) => {
-        dot.classList.remove('bg-blue-500');
-        dot.classList.add('bg-gray-300');
-        if (index === currentThumbnailPage) {
-            dot.classList.remove('bg-gray-300');
-            dot.classList.add('bg-blue-500');
-        }
-    });
-}
-
 
 document.addEventListener('DOMContentLoaded', function() {
     
