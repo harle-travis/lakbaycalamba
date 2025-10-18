@@ -1,71 +1,13 @@
 @props(['establishment'])
 
-<style>
-.slider-slide {
-    opacity: 0;
-    transition: opacity 0.5s ease-in-out;
-}
-
-.slider-slide.active {
-    opacity: 1;
-}
-
-.slider-dot:hover {
-    background-color: rgba(255, 255, 255, 0.8) !important;
-}
-
-.slider-prev:hover,
-.slider-next:hover {
-    background-color: rgba(0, 0, 0, 0.7) !important;
-}
-</style>
-
 <div class="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 p-4 w-full max-w-sm mx-auto" data-establishment-id="{{ $establishment->id }}">
-    <div class="relative bg-gray-200 rounded-lg h-48 mb-4 overflow-hidden group">
+    <a href="{{ route('establishment.show', $establishment) }}" class="block bg-gray-200 rounded-lg h-48 mb-4 flex items-center justify-center hover:opacity-90 transition-opacity overflow-hidden">
         @if($establishment->pictures->count() > 0)
-            <div class="slider-container relative h-full w-full" data-establishment-id="{{ $establishment->id }}">
-                @foreach($establishment->pictures as $index => $picture)
-                    <div class="slider-slide {{ $index === 0 ? 'active' : '' }} absolute inset-0 transition-opacity duration-500">
-                        <a href="{{ route('establishment.show', $establishment) }}" class="block h-full w-full">
-                            <img src="{{ asset('storage/' . $picture->image_path) }}" 
-                                 alt="{{ $establishment->establishment_name }}" 
-                                 class="object-cover h-full w-full rounded-lg hover:opacity-90 transition-opacity">
-                        </a>
-                    </div>
-                @endforeach
-                
-                @if($establishment->pictures->count() > 1)
-                    <!-- Navigation Dots -->
-                    <div class="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex space-x-1">
-                        @foreach($establishment->pictures as $index => $picture)
-                            <button class="slider-dot w-2 h-2 rounded-full {{ $index === 0 ? 'bg-white' : 'bg-white/50' }} transition-colors duration-200"
-                                    data-slide="{{ $index }}"
-                                    data-establishment-id="{{ $establishment->id }}">
-                            </button>
-                        @endforeach
-                    </div>
-                    
-                    <!-- Navigation Arrows -->
-                    <button class="slider-prev absolute left-2 top-1/2 transform -translate-y-1/2 bg-black/50 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-                            data-establishment-id="{{ $establishment->id }}">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                            <path d="M15 18l-6-6 6-6"/>
-                        </svg>
-                    </button>
-                    <button class="slider-next absolute right-2 top-1/2 transform -translate-y-1/2 bg-black/50 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-                            data-establishment-id="{{ $establishment->id }}">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                            <path d="M9 18l6-6-6-6"/>
-                        </svg>
-                    </button>
-                @endif
-            </div>
+            <img src="{{ asset('storage/' . $establishment->pictures->first()->image_path) }}" alt="{{ $establishment->establishment_name }}" class="object-cover h-full w-full rounded-lg">
         @else
-            <a href="{{ route('establishment.show', $establishment) }}" class="block h-full w-full flex items-center justify-center hover:opacity-90 transition-opacity">
-                <span class="text-gray-400">No Image</span>
-            </a>
+            <span class="text-gray-400">No Image</span>
         @endif
-    </div>
+    </a>
     <div class="flex justify-between items-start mb-2">
         <a href="{{ route('establishment.show', $establishment) }}" class="font-bold text-lg truncate w-3/4 hover:text-blue-600 transition-colors">
             {{ $establishment->establishment_name }}
@@ -185,12 +127,6 @@ window.toggleFavorite = function(establishmentId) {
 document.addEventListener('DOMContentLoaded', function() {
     const establishmentId = {{ $establishment->id }};
     checkFavoriteStatus(establishmentId);
-    
-    // Initialize slider if there are multiple images
-    const sliderContainer = document.querySelector(`[data-establishment-id="${establishmentId}"].slider-container`);
-    if (sliderContainer && sliderContainer.querySelectorAll('.slider-slide').length > 1) {
-        initializeSlider(establishmentId);
-    }
 });
 
 function checkFavoriteStatus(establishmentId) {
@@ -241,122 +177,5 @@ function showNotification(message, type) {
     setTimeout(() => {
         notification.remove();
     }, 3000);
-}
-
-// Slider functionality
-function initializeSlider(establishmentId) {
-    const container = document.querySelector(`[data-establishment-id="${establishmentId}"].slider-container`);
-    if (!container) return;
-    
-    const slides = container.querySelectorAll('.slider-slide');
-    const dots = container.querySelectorAll('.slider-dot');
-    const prevBtn = container.querySelector('.slider-prev');
-    const nextBtn = container.querySelector('.slider-next');
-    
-    let currentSlide = 0;
-    const totalSlides = slides.length;
-    
-    // Auto-play functionality
-    let autoPlayInterval = setInterval(() => {
-        nextSlide();
-    }, 4000); // Change slide every 4 seconds
-    
-    // Pause auto-play on hover
-    container.addEventListener('mouseenter', () => {
-        clearInterval(autoPlayInterval);
-    });
-    
-    // Resume auto-play when mouse leaves
-    container.addEventListener('mouseleave', () => {
-        autoPlayInterval = setInterval(() => {
-            nextSlide();
-        }, 4000);
-    });
-    
-    function showSlide(index) {
-        // Hide all slides
-        slides.forEach(slide => {
-            slide.classList.remove('active');
-            slide.style.opacity = '0';
-        });
-        
-        // Show current slide
-        slides[index].classList.add('active');
-        slides[index].style.opacity = '1';
-        
-        // Update dots
-        dots.forEach(dot => {
-            dot.classList.remove('bg-white');
-            dot.classList.add('bg-white/50');
-        });
-        dots[index].classList.remove('bg-white/50');
-        dots[index].classList.add('bg-white');
-        
-        currentSlide = index;
-    }
-    
-    function nextSlide() {
-        const nextIndex = (currentSlide + 1) % totalSlides;
-        showSlide(nextIndex);
-    }
-    
-    function prevSlide() {
-        const prevIndex = (currentSlide - 1 + totalSlides) % totalSlides;
-        showSlide(prevIndex);
-    }
-    
-    // Event listeners
-    if (nextBtn) {
-        nextBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            nextSlide();
-        });
-    }
-    
-    if (prevBtn) {
-        prevBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            prevSlide();
-        });
-    }
-    
-    // Dot navigation
-    dots.forEach((dot, index) => {
-        dot.addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            showSlide(index);
-        });
-    });
-    
-    // Touch/swipe support for mobile
-    let startX = 0;
-    let endX = 0;
-    
-    container.addEventListener('touchstart', (e) => {
-        startX = e.touches[0].clientX;
-    });
-    
-    container.addEventListener('touchend', (e) => {
-        endX = e.changedTouches[0].clientX;
-        handleSwipe();
-    });
-    
-    function handleSwipe() {
-        const threshold = 50; // Minimum distance for a swipe
-        const diff = startX - endX;
-        
-        if (Math.abs(diff) > threshold) {
-            if (diff > 0) {
-                // Swipe left - next slide
-                nextSlide();
-            } else {
-                // Swipe right - previous slide
-                prevSlide();
-            }
-        }
-    }
 }
 </script>
