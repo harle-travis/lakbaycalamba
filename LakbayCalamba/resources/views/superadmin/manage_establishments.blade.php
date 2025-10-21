@@ -202,7 +202,7 @@
                          <td class="px-6 py-4 whitespace-nowrap qr-code-container">
                              @if($establishment->qr_code)
                                  <div class="flex justify-center">
-                                     <div class="w-2 h-2 bg-white border border-gray-200 rounded-lg flex items-center justify-center p-2">
+                                     <div class="w-10 h-10 bg-white border border-gray-200 rounded-lg flex items-center justify-center p-2">
                                          {!! $establishment->qr_code !!}
                                      </div>
                                  </div>
