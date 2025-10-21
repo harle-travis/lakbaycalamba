@@ -261,13 +261,13 @@ class SuperAdminController extends Controller
                 if ($useCustomContent && !empty($emailContent)) {
                     // Replace placeholders in custom content
                     $processedContent = $this->replaceEmailPlaceholders($emailContent, $user);
-                    \Mail::raw($processedContent, function ($message) use ($user, $emailSubject) {
+                    Mail::raw($processedContent, function ($message) use ($user, $emailSubject) {
                         $message->to($user->email, $user->name)
                                 ->subject($emailSubject);
                     });
                 } else {
                     // Send default template
-                    \Mail::send('emails.reward-notification', ['user' => $user], function ($message) use ($user, $emailSubject) {
+                    Mail::send('emails.reward-notification', ['user' => $user], function ($message) use ($user, $emailSubject) {
                         $message->to($user->email, $user->name)
                                 ->subject($emailSubject);
                     });
