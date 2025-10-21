@@ -207,7 +207,6 @@ Calamba Tourism Office"
                 </div>
             </div>
         </div>
-    </form>
 
     <!-- Users Table -->
     <div class="bg-white rounded-lg shadow-sm border border-gray-200">
@@ -281,6 +280,7 @@ Calamba Tourism Office"
             @endif
         </div>
     </div>
+    </form>
 </div>
 
 <script>

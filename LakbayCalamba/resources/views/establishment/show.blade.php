@@ -156,17 +156,6 @@
                         </div>
                     @endforeach
                 </div>
-
-                <!-- Claim Stamp Button -->
-                @auth
-                    <a href="{{ route('qr.scanner') }}" class="block w-full bg-blue-700 text-white rounded-lg py-3 font-semibold hover:bg-blue-800 transition-colors mt-6 text-center">
-                        Claim Your Stamp
-                    </a>
-                @else
-                    <button onclick="showStampPopup()" class="w-full bg-blue-700 text-white rounded-lg py-3 font-semibold hover:bg-blue-800 transition-colors mt-6">
-                        Claim Your Stamp
-                    </button>
-                @endauth
             </div>
 
             <!-- Map Card -->
