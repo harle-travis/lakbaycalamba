@@ -16,7 +16,7 @@
     <div class="flex justify-between items-center mb-6">
         <div>
             <h1 class="text-2xl font-bold text-gray-800">Reward Management</h1>
-            <p class="text-gray-600 mt-1">Manage users eligible for rewards (9+ stamps)</p>
+            <p class="text-gray-600 mt-1">Manage users eligible for rewards (4+ stamps)</p>
         </div>
         <div class="flex items-center space-x-4">
             <span class="text-sm text-gray-500">
@@ -89,19 +89,18 @@
     </div>
 
     <!-- Bulk Actions -->
+    @if($rewardEligibleUsers->count() > 0)
     <form id="bulkNotificationForm" method="POST" action="{{ route('superadmin.send-reward-notifications') }}">
         @csrf
         <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
-            <h3 class="text-lg font-semibold text-gray-800 mb-4">Email Management</h3>
+            <h3 class="text-lg font-semibold text-gray-800 mb-4">Bulk Actions</h3>
             <div class="flex items-center space-x-4 mb-4">
-                @if($rewardEligibleUsers->count() > 0)
                 <button type="button" id="selectAllBtn" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm transition-colors">
                     Select All
                 </button>
                 <button type="button" id="deselectAllBtn" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm transition-colors">
                     Deselect All
                 </button>
-                @endif
                 <button type="button" id="editEmailBtn" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm transition-colors flex items-center space-x-2">
                     <i data-lucide="edit" class="w-4 h-4"></i>
                     <span>Edit Email</span>
@@ -110,17 +109,10 @@
                     <i data-lucide="eye" class="w-4 h-4"></i>
                     <span>Preview Email</span>
                 </button>
-                @if($rewardEligibleUsers->count() > 0)
                 <button type="submit" id="sendNotificationsBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg text-sm transition-colors flex items-center space-x-2">
                     <i data-lucide="mail" class="w-4 h-4"></i>
                     <span>Send Notifications</span>
                 </button>
-                @else
-                <button type="button" class="bg-gray-400 text-white px-6 py-2 rounded-lg text-sm cursor-not-allowed flex items-center space-x-2" disabled>
-                    <i data-lucide="mail" class="w-4 h-4"></i>
-                    <span>No Eligible Users</span>
-                </button>
-                @endif
             </div>
             
             <!-- Email Editor (Hidden by default) -->
@@ -153,7 +145,7 @@
                                       rows="8"
                                       placeholder="Dear {user_name},
 
-🎉 Congratulations! You have collected {stamps_count} stamps and are now eligible for a special reward!
+Congratulations! You have collected {stamps_count} stamps and are now eligible for a special reward.
 
 Your Lakbay ID: {lakbay_id}
 
@@ -191,7 +183,7 @@ Calamba Tourism Office"
                         <div id="emailPreview" class="bg-white border border-gray-300 rounded-lg p-4 min-h-64 max-h-96 overflow-y-auto">
                             <div class="text-center py-8">
                                 <i data-lucide="mail" class="w-8 h-8 text-gray-400 mx-auto mb-2"></i>
-                                <p class="text-gray-500 text-sm">Click "Preview Email" to see how the email will look.</p>
+                                <p class="text-gray-500 text-sm">Select a user and click "Preview Email" to see how the email will look.</p>
                             </div>
                         </div>
                     </div>
@@ -207,6 +199,8 @@ Calamba Tourism Office"
                 </div>
             </div>
         </div>
+    </div>
+    @endif
 
     <!-- Users Table -->
     <div class="bg-white rounded-lg shadow-sm border border-gray-200">
@@ -275,7 +269,7 @@ Calamba Tourism Office"
                 <div class="text-center py-12">
                     <i data-lucide="award" class="w-12 h-12 text-gray-400 mx-auto mb-4"></i>
                     <h3 class="text-lg font-medium text-gray-900 mb-2">No eligible users yet</h3>
-                    <p class="text-gray-500">Users need at least 9 stamps to be eligible for rewards.</p>
+                    <p class="text-gray-500">Users need at least 4 stamps to be eligible for rewards.</p>
                 </div>
             @endif
         </div>
@@ -292,98 +286,90 @@ document.addEventListener('DOMContentLoaded', function() {
     const sendNotificationsBtn = document.getElementById('sendNotificationsBtn');
 
     // Select All functionality
-    if (selectAllCheckbox) {
-        selectAllCheckbox.addEventListener('change', function() {
-            userCheckboxes.forEach(checkbox => {
-                checkbox.checked = this.checked;
-            });
+    selectAllCheckbox.addEventListener('change', function() {
+        userCheckboxes.forEach(checkbox => {
+            checkbox.checked = this.checked;
         });
-    }
+    });
 
     // Individual checkbox change
     userCheckboxes.forEach(checkbox => {
         checkbox.addEventListener('change', function() {
             const checkedCount = document.querySelectorAll('.user-checkbox:checked').length;
-            if (selectAllCheckbox) {
-                selectAllCheckbox.checked = checkedCount === userCheckboxes.length;
-                selectAllCheckbox.indeterminate = checkedCount > 0 && checkedCount < userCheckboxes.length;
-            }
+            selectAllCheckbox.checked = checkedCount === userCheckboxes.length;
+            selectAllCheckbox.indeterminate = checkedCount > 0 && checkedCount < userCheckboxes.length;
         });
     });
 
     // Select All button
-    if (selectAllBtn) {
-        selectAllBtn.addEventListener('click', function() {
-            userCheckboxes.forEach(checkbox => {
-                checkbox.checked = true;
-            });
-            if (selectAllCheckbox) {
-                selectAllCheckbox.checked = true;
-                selectAllCheckbox.indeterminate = false;
-            }
+    selectAllBtn.addEventListener('click', function() {
+        userCheckboxes.forEach(checkbox => {
+            checkbox.checked = true;
         });
-    }
+        selectAllCheckbox.checked = true;
+        selectAllCheckbox.indeterminate = false;
+    });
 
     // Deselect All button
-    if (deselectAllBtn) {
-        deselectAllBtn.addEventListener('click', function() {
-            userCheckboxes.forEach(checkbox => {
-                checkbox.checked = false;
-            });
-            if (selectAllCheckbox) {
-                selectAllCheckbox.checked = false;
-                selectAllCheckbox.indeterminate = false;
-            }
+    deselectAllBtn.addEventListener('click', function() {
+        userCheckboxes.forEach(checkbox => {
+            checkbox.checked = false;
         });
-    }
+        selectAllCheckbox.checked = false;
+        selectAllCheckbox.indeterminate = false;
+    });
 
     // Send notifications button
-    if (sendNotificationsBtn) {
-        sendNotificationsBtn.addEventListener('click', function(e) {
-            console.log('Send notifications button clicked');
-            
-            const checkedCount = document.querySelectorAll('.user-checkbox:checked').length;
-            const checkedUsers = document.querySelectorAll('.user-checkbox:checked');
-            
-            console.log('Checked users count:', checkedCount);
-            console.log('Checked users:', Array.from(checkedUsers).map(cb => cb.value));
-            
-            if (checkedCount === 0) {
-                e.preventDefault();
-                alert('Please select at least one user to send notifications.');
-                return;
-            }
+    sendNotificationsBtn.addEventListener('click', function(e) {
+        console.log('Send notifications button clicked');
+        
+        const checkedCount = document.querySelectorAll('.user-checkbox:checked').length;
+        const checkedUsers = document.querySelectorAll('.user-checkbox:checked');
+        
+        console.log('Checked users count:', checkedCount);
+        console.log('Checked users:', Array.from(checkedUsers).map(cb => cb.value));
+        
+        if (checkedCount === 0) {
+            e.preventDefault();
+            alert('Please select at least one user to send notifications.');
+            return;
+        }
 
-            if (!confirm(`Send reward notifications to ${checkedCount} selected user(s)?`)) {
-                e.preventDefault();
-                return;
-            }
+        if (!confirm(`Send reward notifications to ${checkedCount} selected user(s)?`)) {
+            e.preventDefault();
+            return;
+        }
 
-            // Show loading state
-            const originalText = this.innerHTML;
-            this.innerHTML = '<div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>Sending...';
-            this.disabled = true;
+        // Show loading state
+        const originalText = this.innerHTML;
+        this.innerHTML = '<div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>Sending...';
+        this.disabled = true;
 
-            // Log form data before submission
-            const form = document.getElementById('bulkNotificationForm');
-            if (form) {
-                const formData = new FormData(form);
-                console.log('Form data being submitted:');
-                for (let [key, value] of formData.entries()) {
-                    console.log(key, value);
-                }
-            }
+        // Log form data before submission
+        const form = document.getElementById('bulkNotificationForm');
+        const formData = new FormData(form);
+        console.log('Form data being submitted:');
+        for (let [key, value] of formData.entries()) {
+            console.log(key, value);
+        }
 
         // Show immediate feedback
         showNotification(`Sending notifications to ${checkedCount} user(s)...`, 'info');
 
-            // Re-enable button after form submission (in case of validation errors)
-            setTimeout(() => {
-                this.innerHTML = originalText;
-                this.disabled = false;
-            }, 5000);
+        // Add form submission event listener for debugging
+        const form = document.getElementById('bulkNotificationForm');
+        form.addEventListener('submit', function(e) {
+            console.log('Form is being submitted!');
+            console.log('Form action:', this.action);
+            console.log('Form method:', this.method);
         });
-    }
+
+        // Re-enable button after form submission (in case of validation errors)
+        setTimeout(() => {
+            this.innerHTML = originalText;
+            this.disabled = false;
+        }, 5000);
+    });
 
     // Email Editor functionality
     const editEmailBtn = document.getElementById('editEmailBtn');
@@ -398,112 +384,52 @@ document.addEventListener('DOMContentLoaded', function() {
     const resetEmailSettings = document.getElementById('resetEmailSettings');
     const loadSampleTemplate = document.getElementById('loadSampleTemplate');
 
-    // Check if all required elements exist before adding event listeners
-    if (editEmailBtn && emailEditor) {
-        // Edit email button functionality
-        editEmailBtn.addEventListener('click', function() {
-        if (emailEditor.classList.contains('hidden')) {
-            emailEditor.classList.remove('hidden');
-            editEmailBtn.innerHTML = '<i data-lucide="eye-off" class="w-4 h-4"></i><span>Hide Editor</span>';
-            editEmailBtn.classList.remove('bg-green-600', 'hover:bg-green-700');
-            editEmailBtn.classList.add('bg-gray-600', 'hover:bg-gray-700');
+    // Toggle email editor
+    editEmailBtn.addEventListener('click', function() {
+        emailEditor.classList.toggle('hidden');
+        if (!emailEditor.classList.contains('hidden')) {
             // Scroll to editor
             emailEditor.scrollIntoView({ behavior: 'smooth' });
-        } else {
-            emailEditor.classList.add('hidden');
-            editEmailBtn.innerHTML = '<i data-lucide="edit" class="w-4 h-4"></i><span>Edit Email</span>';
-            editEmailBtn.classList.remove('bg-gray-600', 'hover:bg-gray-700');
-            editEmailBtn.classList.add('bg-green-600', 'hover:bg-green-700');
         }
-        });
+    });
 
-        // Close email editor
-        if (closeEmailEditor) {
-            closeEmailEditor.addEventListener('click', function() {
-                emailEditor.classList.add('hidden');
-                editEmailBtn.innerHTML = '<i data-lucide="edit" class="w-4 h-4"></i><span>Edit Email</span>';
-                editEmailBtn.classList.remove('bg-gray-600', 'hover:bg-gray-700');
-                editEmailBtn.classList.add('bg-green-600', 'hover:bg-green-700');
-            });
-        }
-    }
+    // Close email editor
+    closeEmailEditor.addEventListener('click', function() {
+        emailEditor.classList.add('hidden');
+    });
 
     // Toggle custom content editor
-    if (useCustomContent && customContentEditor && emailPreview) {
-        useCustomContent.addEventListener('change', function() {
-            if (this.checked) {
-                customContentEditor.classList.remove('hidden');
-            } else {
-                customContentEditor.classList.add('hidden');
-            }
-            // Clear preview when toggling
-            emailPreview.innerHTML = '<div class="text-center py-8"><i data-lucide="mail" class="w-8 h-8 text-gray-400 mx-auto mb-2"></i><p class="text-gray-500 text-sm">Click "Preview Email" to see how the email will look.</p></div>';
-        });
-    }
-
-    // Function to show sample preview when no users are available
-    function showSamplePreview(subject, content, useCustom) {
-        let previewContent;
-        
-        if (useCustom && content) {
-            // Replace placeholders with sample data
-            previewContent = content
-                .replace(/{user_name}/g, 'John Doe')
-                .replace(/{user_email}/g, 'john.doe@example.com')
-                .replace(/{lakbay_id}/g, 'LC2024001')
-                .replace(/{stamps_count}/g, '9');
-            previewContent = previewContent.replace(/\n/g, '<br>');
+    useCustomContent.addEventListener('change', function() {
+        if (this.checked) {
+            customContentEditor.classList.remove('hidden');
         } else {
-            // Default template with sample data
-            previewContent = `
-                <p>Dear John Doe,</p>
-                <p>🎉 Congratulations! You have collected 9 stamps and are now eligible for a special reward!</p>
-                <p>Your Lakbay ID: LC2024001</p>
-                <p>Please visit the Calamba Tourism Office to claim your reward.</p>
-                <br>
-                <p>Best regards,<br>Calamba Tourism Office</p>
-            `;
+            customContentEditor.classList.add('hidden');
         }
-        
-        emailPreview.innerHTML = `
-            <div class="border border-gray-300 rounded-lg p-4 bg-white">
-                <div class="mb-3 pb-2 border-b border-gray-200">
-                    <h4 class="font-semibold text-gray-800">Subject: ${subject}</h4>
-                    <p class="text-xs text-gray-500 mt-1">📝 Sample Preview (No eligible users available)</p>
-                </div>
-                <div class="email-content">
-                    ${previewContent}
-                </div>
-            </div>
-        `;
-    }
+        // Clear preview when toggling
+        emailPreview.innerHTML = '<div class="text-center py-8"><i data-lucide="mail" class="w-8 h-8 text-gray-400 mx-auto mb-2"></i><p class="text-gray-500 text-sm">Select a user and click "Preview Email" to see how the email will look.</p></div>';
+    });
 
     // Preview email functionality
-    if (previewEmailBtn && emailSubject && emailContent && useCustomContent && emailPreview) {
-        previewEmailBtn.addEventListener('click', function() {
+    previewEmailBtn.addEventListener('click', function() {
         const checkedUsers = document.querySelectorAll('.user-checkbox:checked');
+        
+        if (checkedUsers.length === 0) {
+            alert('Please select at least one user to preview the email.');
+            return;
+        }
+
+        if (checkedUsers.length > 1) {
+            alert('Please select only one user to preview the email.');
+            return;
+        }
+
+        const userId = checkedUsers[0].value;
         const subject = emailSubject.value;
         const content = emailContent.value;
         const useCustom = useCustomContent.checked;
 
         // Show loading state
         emailPreview.innerHTML = '<div class="flex items-center justify-center p-8"><div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div><span class="ml-2 text-gray-600">Loading preview...</span></div>';
-
-        // Use first available user for preview, or create a sample user
-        let userId = null;
-        if (checkedUsers.length > 0) {
-            userId = checkedUsers[0].value;
-        } else {
-            // Use the first user from the list for preview
-            const firstUserCheckbox = document.querySelector('.user-checkbox');
-            if (firstUserCheckbox) {
-                userId = firstUserCheckbox.value;
-            } else {
-                // No users available, show sample preview
-                showSamplePreview(subject, content, useCustom);
-                return;
-            }
-        }
 
         // Make AJAX request to preview email
         fetch('{{ route("superadmin.preview-email") }}', {
@@ -540,21 +466,18 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error('Error:', error);
             emailPreview.innerHTML = '<div class="text-red-600 p-4">Error loading email preview. Please try again.</div>';
         });
-        });
-    }
+    });
 
     // Reset email settings
-    if (resetEmailSettings && emailSubject && emailContent && useCustomContent && customContentEditor && emailPreview) {
-        resetEmailSettings.addEventListener('click', function() {
-            if (confirm('Are you sure you want to reset all email settings to default?')) {
-                emailSubject.value = '🎉 Reward Eligibility - Tourism Monitoring System';
-                emailContent.value = '';
-                useCustomContent.checked = false;
-                customContentEditor.classList.add('hidden');
-                emailPreview.innerHTML = '<div class="text-center py-8"><i data-lucide="mail" class="w-8 h-8 text-gray-400 mx-auto mb-2"></i><p class="text-gray-500 text-sm">Click "Preview Email" to see how the email will look.</p></div>';
-            }
-        });
-    }
+    resetEmailSettings.addEventListener('click', function() {
+        if (confirm('Are you sure you want to reset all email settings to default?')) {
+            emailSubject.value = '🎉 Reward Eligibility - Tourism Monitoring System';
+            emailContent.value = '';
+            useCustomContent.checked = false;
+            customContentEditor.classList.add('hidden');
+            emailPreview.innerHTML = '<div class="text-center py-8"><i data-lucide="mail" class="w-8 h-8 text-gray-400 mx-auto mb-2"></i><p class="text-gray-500 text-sm">Select a user and click "Preview Email" to see how the email will look.</p></div>';
+        }
+    });
 
     // Real-time preview update when content changes
     let previewTimeout;
@@ -564,20 +487,13 @@ document.addEventListener('DOMContentLoaded', function() {
             const checkedUsers = document.querySelectorAll('.user-checkbox:checked');
             if (checkedUsers.length === 1) {
                 previewEmailBtn.click();
-            } else if (checkedUsers.length === 0 && document.querySelectorAll('.user-checkbox').length === 0) {
-                // No users available, show sample preview
-                const subject = emailSubject.value;
-                const content = emailContent.value;
-                const useCustom = useCustomContent.checked;
-                showSamplePreview(subject, content, useCustom);
             }
         }, 1000); // Debounce for 1 second
     }
 
     // Load sample template
-    if (loadSampleTemplate && emailContent) {
-        loadSampleTemplate.addEventListener('click', function() {
-            const sampleTemplate = `Dear {user_name},
+    loadSampleTemplate.addEventListener('click', function() {
+        const sampleTemplate = `Dear {user_name},
 
 🎉 Congratulations! You have collected {stamps_count} stamps and are now eligible for a special reward!
 
@@ -601,22 +517,15 @@ Thank you for exploring our beautiful tourist destinations in Calamba!
 
 Best regards,
 Calamba Tourism Office`;
-            
-            emailContent.value = sampleTemplate;
-            updatePreview();
-        });
-    }
+        
+        emailContent.value = sampleTemplate;
+        updatePreview();
+    });
 
     // Add event listeners for real-time preview
-    if (emailSubject) {
-        emailSubject.addEventListener('input', updatePreview);
-    }
-    if (emailContent) {
-        emailContent.addEventListener('input', updatePreview);
-    }
-    if (useCustomContent) {
-        useCustomContent.addEventListener('change', updatePreview);
-    }
+    emailSubject.addEventListener('input', updatePreview);
+    emailContent.addEventListener('input', updatePreview);
+    useCustomContent.addEventListener('change', updatePreview);
 
     // Show success notification if there's a success message
     @if(session('success'))
@@ -635,18 +544,6 @@ Calamba Tourism Office`;
         console.log('Form action:', form.action);
         console.log('Form method:', form.method);
         console.log('Form checkboxes:', document.querySelectorAll('.user-checkbox').length);
-        
-        // Add form submission handler for debugging (only once)
-        form.addEventListener('submit', function(e) {
-            const checkedUsers = document.querySelectorAll('.user-checkbox:checked');
-            console.log('Form submitting with', checkedUsers.length, 'users selected');
-            
-            if (checkedUsers.length === 0) {
-                e.preventDefault();
-                alert('Please select at least one user to send notifications to.');
-                return false;
-            }
-        });
     } else {
         console.error('Form not found!');
     }
