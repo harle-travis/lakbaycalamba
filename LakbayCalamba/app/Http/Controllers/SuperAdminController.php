@@ -196,6 +196,8 @@ class SuperAdminController extends Controller
         \Log::info('All request data:', $request->all());
         \Log::info('Request method: ' . $request->method());
         \Log::info('Request URL: ' . $request->fullUrl());
+        \Log::info('CSRF Token: ' . $request->input('_token'));
+        \Log::info('User IDs from request: ' . json_encode($request->input('user_ids', [])));
         
         $userIds = $request->input('user_ids', []);
         $emailSubject = $request->input('email_subject', '🎉 Reward Eligibility - Tourism Monitoring System');
@@ -211,10 +213,19 @@ class SuperAdminController extends Controller
         ]);
         
         if (empty($userIds)) {
+            \Log::warning('No user IDs provided in request');
             return back()->with('error', 'No users selected for notification.');
         }
 
-        $users = User::whereIn('id', $userIds)->get();
+        \Log::info('Attempting to find users with IDs: ' . json_encode($userIds));
+        
+        try {
+            $users = User::whereIn('id', $userIds)->get();
+            \Log::info('Database query successful, found ' . $users->count() . ' users');
+        } catch (\Exception $e) {
+            \Log::error('Database error when fetching users: ' . $e->getMessage());
+            return back()->with('error', 'Database error occurred while fetching users.');
+        }
         
         // Debug: Log all users being processed
         \Log::info('Users found for notification:', $users->map(function($user) {

@@ -340,55 +340,48 @@ document.addEventListener('DOMContentLoaded', function() {
     // Send notifications button
     if (sendNotificationsBtn) {
         sendNotificationsBtn.addEventListener('click', function(e) {
-        console.log('Send notifications button clicked');
-        
-        const checkedCount = document.querySelectorAll('.user-checkbox:checked').length;
-        const checkedUsers = document.querySelectorAll('.user-checkbox:checked');
-        
-        console.log('Checked users count:', checkedCount);
-        console.log('Checked users:', Array.from(checkedUsers).map(cb => cb.value));
-        
-        if (checkedCount === 0) {
-            e.preventDefault();
-            alert('Please select at least one user to send notifications.');
-            return;
-        }
-
-        if (!confirm(`Send reward notifications to ${checkedCount} selected user(s)?`)) {
-            e.preventDefault();
-            return;
-        }
-
-        // Show loading state
-        const originalText = this.innerHTML;
-        this.innerHTML = '<div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>Sending...';
-        this.disabled = true;
-
-        // Log form data before submission
-        const form = document.getElementById('bulkNotificationForm');
-        if (form) {
-            const formData = new FormData(form);
-            console.log('Form data being submitted:');
-            for (let [key, value] of formData.entries()) {
-                console.log(key, value);
+            console.log('Send notifications button clicked');
+            
+            const checkedCount = document.querySelectorAll('.user-checkbox:checked').length;
+            const checkedUsers = document.querySelectorAll('.user-checkbox:checked');
+            
+            console.log('Checked users count:', checkedCount);
+            console.log('Checked users:', Array.from(checkedUsers).map(cb => cb.value));
+            
+            if (checkedCount === 0) {
+                e.preventDefault();
+                alert('Please select at least one user to send notifications.');
+                return;
             }
 
-            // Add form submission event listener for debugging
-            form.addEventListener('submit', function(e) {
-                console.log('Form is being submitted!');
-                console.log('Form action:', this.action);
-                console.log('Form method:', this.method);
-            });
-        }
+            if (!confirm(`Send reward notifications to ${checkedCount} selected user(s)?`)) {
+                e.preventDefault();
+                return;
+            }
+
+            // Show loading state
+            const originalText = this.innerHTML;
+            this.innerHTML = '<div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>Sending...';
+            this.disabled = true;
+
+            // Log form data before submission
+            const form = document.getElementById('bulkNotificationForm');
+            if (form) {
+                const formData = new FormData(form);
+                console.log('Form data being submitted:');
+                for (let [key, value] of formData.entries()) {
+                    console.log(key, value);
+                }
+            }
 
         // Show immediate feedback
         showNotification(`Sending notifications to ${checkedCount} user(s)...`, 'info');
 
-        // Re-enable button after form submission (in case of validation errors)
-        setTimeout(() => {
-            this.innerHTML = originalText;
-            this.disabled = false;
-        }, 5000);
+            // Re-enable button after form submission (in case of validation errors)
+            setTimeout(() => {
+                this.innerHTML = originalText;
+                this.disabled = false;
+            }, 5000);
         });
     }
 
@@ -643,7 +636,7 @@ Calamba Tourism Office`;
         console.log('Form method:', form.method);
         console.log('Form checkboxes:', document.querySelectorAll('.user-checkbox').length);
         
-        // Add form submission handler for debugging
+        // Add form submission handler for debugging (only once)
         form.addEventListener('submit', function(e) {
             const checkedUsers = document.querySelectorAll('.user-checkbox:checked');
             console.log('Form submitting with', checkedUsers.length, 'users selected');
