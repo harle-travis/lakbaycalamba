@@ -150,7 +150,6 @@
                     <tr>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Establishment Name</th>
                                                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
-                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Location</th>
                          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Photos</th>
                          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">QR Code</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">QR Actions</th>
@@ -188,7 +187,6 @@
                                 </span>
                             @endif
                         </td>
-                                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $establishment->location }}</td>
                          <td class="px-6 py-4 whitespace-nowrap">
                              @if($establishment->pictures->count() > 0)
                                  <button onclick="viewPhotos({{ $establishment->id }})" class="text-blue-600 hover:text-blue-900 flex items-center space-x-1">
