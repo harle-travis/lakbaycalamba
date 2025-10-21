@@ -89,8 +89,8 @@
     
     /* QR Code table improvements */
     .qr-code-container {
-        min-width: 30px;
-        min-height: 30px;
+        min-width: 80px;
+        min-height: 80px;
     }
     
     .qr-actions-container {
@@ -202,7 +202,7 @@
                          <td class="px-6 py-4 whitespace-nowrap qr-code-container">
                              @if($establishment->qr_code)
                                  <div class="flex justify-center">
-                                     <div class="w-20 h-20 bg-white border border-gray-200 rounded-lg flex items-center justify-center p-2">
+                                     <div class="w-2 h-2 bg-white border border-gray-200 rounded-lg flex items-center justify-center p-2">
                                          {!! $establishment->qr_code !!}
                                      </div>
                                  </div>
