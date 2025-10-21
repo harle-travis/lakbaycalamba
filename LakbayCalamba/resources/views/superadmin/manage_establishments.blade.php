@@ -925,5 +925,5 @@
  <script>
      window.STORAGE_BASE_URL = "{{ rtrim(Storage::url(''), '/') }}";
  </script>
-   <script src="{{ asset('js/manage-establishments.js') }}"></script>
+   <script src="/js/manage-establishments.js"></script>
 @endsection

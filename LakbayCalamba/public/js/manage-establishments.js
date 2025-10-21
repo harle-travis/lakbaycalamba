@@ -554,18 +554,13 @@ document.addEventListener('DOMContentLoaded', function() {
             method: 'POST',
             body: establishmentData,
             headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                'Accept': 'application/json'
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
             }
         })
         .then(response => {
             console.log('Establishment response status:', response.status);
             if (!response.ok) {
-                return response.json().then(err => {
-                    throw new Error(`HTTP error! status: ${response.status}, message: ${err.message || 'Unknown error'}`);
-                }).catch(() => {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                });
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
             return response.json();
         })
