@@ -178,10 +178,10 @@ class SuperAdminController extends Controller
 
     public function manageRewards()
     {
-        // Get users with 4 or more stamps (temporary threshold)
+        // Get users with 9 or more stamps (reward threshold)
         $rewardEligibleUsers = User::where('role', 'tourist')
             ->withCount('stamps')
-            ->having('stamps_count', '>=', 4)
+            ->having('stamps_count', '>=', 9)
             ->with(['stamps.establishment'])
             ->orderBy('stamps_count', 'desc')
             ->get();

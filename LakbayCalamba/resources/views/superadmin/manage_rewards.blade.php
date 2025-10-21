@@ -16,7 +16,7 @@
     <div class="flex justify-between items-center mb-6">
         <div>
             <h1 class="text-2xl font-bold text-gray-800">Reward Management</h1>
-            <p class="text-gray-600 mt-1">Manage users eligible for rewards (4+ stamps)</p>
+            <p class="text-gray-600 mt-1">Manage users eligible for rewards (9+ stamps)</p>
         </div>
         <div class="flex items-center space-x-4">
             <span class="text-sm text-gray-500">
@@ -89,18 +89,19 @@
     </div>
 
     <!-- Bulk Actions -->
-    @if($rewardEligibleUsers->count() > 0)
     <form id="bulkNotificationForm" method="POST" action="{{ route('superadmin.send-reward-notifications') }}">
         @csrf
         <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
-            <h3 class="text-lg font-semibold text-gray-800 mb-4">Bulk Actions</h3>
+            <h3 class="text-lg font-semibold text-gray-800 mb-4">Email Management</h3>
             <div class="flex items-center space-x-4 mb-4">
+                @if($rewardEligibleUsers->count() > 0)
                 <button type="button" id="selectAllBtn" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm transition-colors">
                     Select All
                 </button>
                 <button type="button" id="deselectAllBtn" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm transition-colors">
                     Deselect All
                 </button>
+                @endif
                 <button type="button" id="editEmailBtn" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm transition-colors flex items-center space-x-2">
                     <i data-lucide="edit" class="w-4 h-4"></i>
                     <span>Edit Email</span>
@@ -109,10 +110,17 @@
                     <i data-lucide="eye" class="w-4 h-4"></i>
                     <span>Preview Email</span>
                 </button>
+                @if($rewardEligibleUsers->count() > 0)
                 <button type="submit" id="sendNotificationsBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg text-sm transition-colors flex items-center space-x-2">
                     <i data-lucide="mail" class="w-4 h-4"></i>
                     <span>Send Notifications</span>
                 </button>
+                @else
+                <button type="button" class="bg-gray-400 text-white px-6 py-2 rounded-lg text-sm cursor-not-allowed flex items-center space-x-2" disabled>
+                    <i data-lucide="mail" class="w-4 h-4"></i>
+                    <span>No Eligible Users</span>
+                </button>
+                @endif
             </div>
             
             <!-- Email Editor (Hidden by default) -->
@@ -145,7 +153,7 @@
                                       rows="8"
                                       placeholder="Dear {user_name},
 
-Congratulations! You have collected {stamps_count} stamps and are now eligible for a special reward.
+🎉 Congratulations! You have collected {stamps_count} stamps and are now eligible for a special reward!
 
 Your Lakbay ID: {lakbay_id}
 
@@ -199,8 +207,7 @@ Calamba Tourism Office"
                 </div>
             </div>
         </div>
-    </div>
-    @endif
+    </form>
 
     <!-- Users Table -->
     <div class="bg-white rounded-lg shadow-sm border border-gray-200">
@@ -269,12 +276,11 @@ Calamba Tourism Office"
                 <div class="text-center py-12">
                     <i data-lucide="award" class="w-12 h-12 text-gray-400 mx-auto mb-4"></i>
                     <h3 class="text-lg font-medium text-gray-900 mb-2">No eligible users yet</h3>
-                    <p class="text-gray-500">Users need at least 4 stamps to be eligible for rewards.</p>
+                    <p class="text-gray-500">Users need at least 9 stamps to be eligible for rewards.</p>
                 </div>
             @endif
         </div>
     </div>
-    </form>
 </div>
 
 <script>
@@ -419,6 +425,43 @@ document.addEventListener('DOMContentLoaded', function() {
         emailPreview.innerHTML = '<div class="text-center py-8"><i data-lucide="mail" class="w-8 h-8 text-gray-400 mx-auto mb-2"></i><p class="text-gray-500 text-sm">Click "Preview Email" to see how the email will look.</p></div>';
     });
 
+    // Function to show sample preview when no users are available
+    function showSamplePreview(subject, content, useCustom) {
+        let previewContent;
+        
+        if (useCustom && content) {
+            // Replace placeholders with sample data
+            previewContent = content
+                .replace(/{user_name}/g, 'John Doe')
+                .replace(/{user_email}/g, 'john.doe@example.com')
+                .replace(/{lakbay_id}/g, 'LC2024001')
+                .replace(/{stamps_count}/g, '9');
+            previewContent = previewContent.replace(/\n/g, '<br>');
+        } else {
+            // Default template with sample data
+            previewContent = `
+                <p>Dear John Doe,</p>
+                <p>🎉 Congratulations! You have collected 9 stamps and are now eligible for a special reward!</p>
+                <p>Your Lakbay ID: LC2024001</p>
+                <p>Please visit the Calamba Tourism Office to claim your reward.</p>
+                <br>
+                <p>Best regards,<br>Calamba Tourism Office</p>
+            `;
+        }
+        
+        emailPreview.innerHTML = `
+            <div class="border border-gray-300 rounded-lg p-4 bg-white">
+                <div class="mb-3 pb-2 border-b border-gray-200">
+                    <h4 class="font-semibold text-gray-800">Subject: ${subject}</h4>
+                    <p class="text-xs text-gray-500 mt-1">📝 Sample Preview (No eligible users available)</p>
+                </div>
+                <div class="email-content">
+                    ${previewContent}
+                </div>
+            </div>
+        `;
+    }
+
     // Preview email functionality
     previewEmailBtn.addEventListener('click', function() {
         const checkedUsers = document.querySelectorAll('.user-checkbox:checked');
@@ -438,6 +481,10 @@ document.addEventListener('DOMContentLoaded', function() {
             const firstUserCheckbox = document.querySelector('.user-checkbox');
             if (firstUserCheckbox) {
                 userId = firstUserCheckbox.value;
+            } else {
+                // No users available, show sample preview
+                showSamplePreview(subject, content, useCustom);
+                return;
             }
         }
 
@@ -497,6 +544,12 @@ document.addEventListener('DOMContentLoaded', function() {
             const checkedUsers = document.querySelectorAll('.user-checkbox:checked');
             if (checkedUsers.length === 1) {
                 previewEmailBtn.click();
+            } else if (checkedUsers.length === 0 && document.querySelectorAll('.user-checkbox').length === 0) {
+                // No users available, show sample preview
+                const subject = emailSubject.value;
+                const content = emailContent.value;
+                const useCustom = useCustomContent.checked;
+                showSamplePreview(subject, content, useCustom);
             }
         }, 1000); // Debounce for 1 second
     }
