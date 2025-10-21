@@ -86,6 +86,21 @@
         color: #374151;
         font-weight: 500;
     }
+    
+    /* QR Code table improvements */
+    .qr-code-container {
+        min-width: 80px;
+        min-height: 80px;
+    }
+    
+    .qr-actions-container {
+        min-width: 120px;
+    }
+    
+    .qr-actions-container button {
+        min-width: 100px;
+        white-space: nowrap;
+    }
 </style>
 
 <div class="p-6">
@@ -130,7 +145,7 @@
     <!-- Establishments List -->
     <div class="bg-white rounded-lg border border-gray-200">
         <div class="overflow-x-auto">
-            <table class="w-full">
+            <table class="w-full min-w-max">
                 <thead class="bg-gray-50">
                     <tr>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Establishment Name</th>
@@ -138,7 +153,8 @@
                          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Location</th>
                          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Photos</th>
                          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">QR Code</th>
-                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">QR Actions</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
@@ -183,28 +199,38 @@
                                  <span class="text-gray-400 text-sm">No photos</span>
                              @endif
                          </td>
-                         <td class="px-6 py-4 whitespace-nowrap">
+                         <td class="px-6 py-4 whitespace-nowrap qr-code-container">
                              @if($establishment->qr_code)
-                                 <div class="flex flex-col items-center space-y-2">
-                                     <div class="w-16 h-16 bg-white border border-gray-200 rounded-lg flex items-center justify-center">
+                                 <div class="flex justify-center">
+                                     <div class="w-20 h-20 bg-white border border-gray-200 rounded-lg flex items-center justify-center p-2">
                                          {!! $establishment->qr_code !!}
-                                     </div>
-                                     <div class="text-center">
-                                        <button onclick="viewQRCode({{ $establishment->id }})" class="text-blue-600 hover:text-blue-900 text-xs">
-                                            View & Test (No Visitor Count)
-                                        </button>
-                                         <br>
-                                         <button onclick="regenerateQRCode({{ $establishment->id }})" class="text-green-600 hover:text-green-900 text-xs">
-                                             Regenerate
-                                         </button>
                                      </div>
                                  </div>
                              @else
                                  <div class="text-center">
-                                     <span class="text-gray-400 text-sm">No QR Code</span>
-                                     <br>
-                                     <button onclick="generateQRCode({{ $establishment->id }})" class="text-blue-600 hover:text-blue-900 text-xs">
-                                         Generate
+                                     <div class="w-20 h-20 bg-gray-100 border border-gray-200 rounded-lg flex items-center justify-center">
+                                         <i data-lucide="qr-code" class="w-8 h-8 text-gray-400"></i>
+                                     </div>
+                                 </div>
+                             @endif
+                         </td>
+                         <td class="px-6 py-4 whitespace-nowrap qr-actions-container">
+                             @if($establishment->qr_code)
+                                 <div class="flex flex-col space-y-2">
+                                     <button onclick="viewQRCode({{ $establishment->id }})" class="bg-blue-600 text-white px-3 py-1 rounded text-xs hover:bg-blue-700 transition-colors flex items-center justify-center space-x-1">
+                                         <i data-lucide="eye" class="w-3 h-3"></i>
+                                         <span>View & Test</span>
+                                     </button>
+                                     <button onclick="regenerateQRCode({{ $establishment->id }})" class="bg-green-600 text-white px-3 py-1 rounded text-xs hover:bg-green-700 transition-colors flex items-center justify-center space-x-1">
+                                         <i data-lucide="refresh-cw" class="w-3 h-3"></i>
+                                         <span>Regenerate</span>
+                                     </button>
+                                 </div>
+                             @else
+                                 <div class="flex justify-center">
+                                     <button onclick="generateQRCode({{ $establishment->id }})" class="bg-blue-600 text-white px-3 py-1 rounded text-xs hover:bg-blue-700 transition-colors flex items-center justify-center space-x-1">
+                                         <i data-lucide="plus" class="w-3 h-3"></i>
+                                         <span>Generate</span>
                                      </button>
                                  </div>
                              @endif
@@ -220,7 +246,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="6" class="px-6 py-4 text-center text-gray-500">
+                        <td colspan="7" class="px-6 py-4 text-center text-gray-500">
                             No establishments found. Add your first establishment!
                         </td>
                     </tr>
