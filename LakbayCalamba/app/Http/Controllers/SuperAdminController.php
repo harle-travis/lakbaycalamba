@@ -263,13 +263,13 @@ class SuperAdminController extends Controller
                     $processedContent = $this->replaceEmailPlaceholders($emailContent, $user);
                     Mail::raw($processedContent, function ($message) use ($user, $emailSubject) {
                         $message->to($user->email, $user->name)
-                                ->subject($emailSubject);
+                                ->subject('Reward Eligibility - Tourism Monitoring System');
                     });
                 } else {
                     // Send default template
                     Mail::send('emails.reward-notification', ['user' => $user], function ($message) use ($user, $emailSubject) {
                         $message->to($user->email, $user->name)
-                                ->subject($emailSubject);
+                                ->subject('Reward Eligibility - Tourism Monitoring System');
                     });
                 }
                 $sentCount++;
