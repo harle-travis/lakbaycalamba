@@ -89,8 +89,8 @@
     
     /* QR Code table improvements */
     .qr-code-container {
-        min-width: 80px;
-        min-height: 80px;
+        min-width: 30px;
+        min-height: 30px;
     }
     
     .qr-actions-container {
