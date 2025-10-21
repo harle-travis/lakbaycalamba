@@ -263,14 +263,12 @@ class SuperAdminController extends Controller
                     $processedContent = $this->replaceEmailPlaceholders($emailContent, $user);
                     \Mail::raw($processedContent, function ($message) use ($user, $emailSubject) {
                         $message->to($user->email, $user->name)
-                                ->from(config('mail.from.address'), config('mail.from.name'))
                                 ->subject($emailSubject);
                     });
                 } else {
                     // Send default template
                     \Mail::send('emails.reward-notification', ['user' => $user], function ($message) use ($user, $emailSubject) {
                         $message->to($user->email, $user->name)
-                                ->from(config('mail.from.address'), config('mail.from.name'))
                                 ->subject($emailSubject);
                     });
                 }
