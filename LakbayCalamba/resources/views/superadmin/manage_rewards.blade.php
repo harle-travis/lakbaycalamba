@@ -357,7 +357,6 @@ document.addEventListener('DOMContentLoaded', function() {
         showNotification(`Sending notifications to ${checkedCount} user(s)...`, 'info');
 
         // Add form submission event listener for debugging
-        const form = document.getElementById('bulkNotificationForm');
         form.addEventListener('submit', function(e) {
             console.log('Form is being submitted!');
             console.log('Form action:', this.action);
@@ -384,34 +383,29 @@ document.addEventListener('DOMContentLoaded', function() {
     const resetEmailSettings = document.getElementById('resetEmailSettings');
     const loadSampleTemplate = document.getElementById('loadSampleTemplate');
 
-    // Toggle email editor
-    editEmailBtn.addEventListener('click', function() {
-        emailEditor.classList.toggle('hidden');
-        if (!emailEditor.classList.contains('hidden')) {
-            // Scroll to editor
-            emailEditor.scrollIntoView({ behavior: 'smooth' });
-        }
-    });
-
-    // Close email editor
-    closeEmailEditor.addEventListener('click', function() {
-        emailEditor.classList.add('hidden');
-    });
-
     // Edit email button functionality
     editEmailBtn.addEventListener('click', function() {
-        const emailEditor = document.getElementById('emailEditor');
         if (emailEditor.classList.contains('hidden')) {
             emailEditor.classList.remove('hidden');
             editEmailBtn.innerHTML = '<i data-lucide="eye-off" class="w-4 h-4"></i><span>Hide Editor</span>';
             editEmailBtn.classList.remove('bg-green-600', 'hover:bg-green-700');
             editEmailBtn.classList.add('bg-gray-600', 'hover:bg-gray-700');
+            // Scroll to editor
+            emailEditor.scrollIntoView({ behavior: 'smooth' });
         } else {
             emailEditor.classList.add('hidden');
             editEmailBtn.innerHTML = '<i data-lucide="edit" class="w-4 h-4"></i><span>Edit Email</span>';
             editEmailBtn.classList.remove('bg-gray-600', 'hover:bg-gray-700');
             editEmailBtn.classList.add('bg-green-600', 'hover:bg-green-700');
         }
+    });
+
+    // Close email editor
+    closeEmailEditor.addEventListener('click', function() {
+        emailEditor.classList.add('hidden');
+        editEmailBtn.innerHTML = '<i data-lucide="edit" class="w-4 h-4"></i><span>Edit Email</span>';
+        editEmailBtn.classList.remove('bg-gray-600', 'hover:bg-gray-700');
+        editEmailBtn.classList.add('bg-green-600', 'hover:bg-green-700');
     });
 
     // Toggle custom content editor
