@@ -93,14 +93,16 @@
     <form id="bulkNotificationForm" method="POST" action="{{ route('superadmin.send-reward-notifications') }}">
         @csrf
         <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
-            <h3 class="text-lg font-semibold text-gray-800 mb-4">Bulk Actions</h3>
+            <h3 class="text-lg font-semibold text-gray-800 mb-4">Email Management</h3>
             <div class="flex items-center space-x-4 mb-4">
+                @if($rewardEligibleUsers->count() > 0)
                 <button type="button" id="selectAllBtn" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm transition-colors">
                     Select All
                 </button>
                 <button type="button" id="deselectAllBtn" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm transition-colors">
                     Deselect All
                 </button>
+                @endif
                 <button type="button" id="editEmailBtn" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm transition-colors flex items-center space-x-2">
                     <i data-lucide="edit" class="w-4 h-4"></i>
                     <span>Edit Email</span>
@@ -109,10 +111,17 @@
                     <i data-lucide="eye" class="w-4 h-4"></i>
                     <span>Preview Email</span>
                 </button>
+                @if($rewardEligibleUsers->count() > 0)
                 <button type="submit" id="sendNotificationsBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg text-sm transition-colors flex items-center space-x-2">
                     <i data-lucide="mail" class="w-4 h-4"></i>
                     <span>Send Notifications</span>
                 </button>
+                @else
+                <button type="button" class="bg-gray-400 text-white px-6 py-2 rounded-lg text-sm cursor-not-allowed flex items-center space-x-2" disabled>
+                    <i data-lucide="mail" class="w-4 h-4"></i>
+                    <span>No Eligible Users</span>
+                </button>
+                @endif
             </div>
             
             <!-- Email Editor (Hidden by default) -->
