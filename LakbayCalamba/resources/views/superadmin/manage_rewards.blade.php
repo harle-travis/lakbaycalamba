@@ -209,7 +209,7 @@ Calamba Tourism Office"
             </div>
         </div>
     </div>
-    @endif
+    
 
     <!-- Users Table -->
     <div class="bg-white rounded-lg shadow-sm border border-gray-200">
@@ -448,6 +448,43 @@ document.addEventListener('DOMContentLoaded', function() {
             // Clear preview when toggling
             emailPreview.innerHTML = '<div class="text-center py-8"><i data-lucide="mail" class="w-8 h-8 text-gray-400 mx-auto mb-2"></i><p class="text-gray-500 text-sm">Click "Preview Email" to see how the email will look.</p></div>';
         });
+    }
+
+    // Function to show sample preview when no users are available
+    function showSamplePreview(subject, content, useCustom) {
+        let previewContent;
+        
+        if (useCustom && content) {
+            // Replace placeholders with sample data
+            previewContent = content
+                .replace(/{user_name}/g, 'John Doe')
+                .replace(/{user_email}/g, 'john.doe@example.com')
+                .replace(/{lakbay_id}/g, 'LC2024001')
+                .replace(/{stamps_count}/g, '9');
+            previewContent = previewContent.replace(/\n/g, '<br>');
+        } else {
+            // Default template with sample data
+            previewContent = `
+                <p>Dear John Doe,</p>
+                <p>🎉 Congratulations! You have collected 9 stamps and are now eligible for a special reward!</p>
+                <p>Your Lakbay ID: LC2024001</p>
+                <p>Please visit the Calamba Tourism Office to claim your reward.</p>
+                <br>
+                <p>Best regards,<br>Calamba Tourism Office</p>
+            `;
+        }
+        
+        emailPreview.innerHTML = `
+            <div class="border border-gray-300 rounded-lg p-4 bg-white">
+                <div class="mb-3 pb-2 border-b border-gray-200">
+                    <h4 class="font-semibold text-gray-800">Subject: ${subject}</h4>
+                    <p class="text-xs text-gray-500 mt-1">📝 Sample Preview (No eligible users available)</p>
+                </div>
+                <div class="email-content">
+                    ${previewContent}
+                </div>
+            </div>
+        `;
     }
 
     // Preview email functionality
