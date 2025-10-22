@@ -192,7 +192,7 @@ Calamba Tourism Office"
                         <div id="emailPreview" class="bg-white border border-gray-300 rounded-lg p-4 min-h-64 max-h-96 overflow-y-auto">
                             <div class="text-center py-8">
                                 <i data-lucide="mail" class="w-8 h-8 text-gray-400 mx-auto mb-2"></i>
-                                <p class="text-gray-500 text-sm">Select a user and click "Preview Email" to see how the email will look.</p>
+                                <p class="text-gray-500 text-sm">Click "Preview Email" to see how the email will look.</p>
                             </div>
                         </div>
                     </div>
@@ -305,8 +305,10 @@ document.addEventListener('DOMContentLoaded', function() {
     userCheckboxes.forEach(checkbox => {
         checkbox.addEventListener('change', function() {
             const checkedCount = document.querySelectorAll('.user-checkbox:checked').length;
-            selectAllCheckbox.checked = checkedCount === userCheckboxes.length;
-            selectAllCheckbox.indeterminate = checkedCount > 0 && checkedCount < userCheckboxes.length;
+            if (selectAllCheckbox) {
+                selectAllCheckbox.checked = checkedCount === userCheckboxes.length;
+                selectAllCheckbox.indeterminate = checkedCount > 0 && checkedCount < userCheckboxes.length;
+            }
         });
     });
 
@@ -315,18 +317,24 @@ document.addEventListener('DOMContentLoaded', function() {
         userCheckboxes.forEach(checkbox => {
             checkbox.checked = true;
         });
-        selectAllCheckbox.checked = true;
-        selectAllCheckbox.indeterminate = false;
+        if (selectAllCheckbox) {
+                selectAllCheckbox.checked = true;
+                selectAllCheckbox.indeterminate = false;
+            }
     });
 
     // Deselect All button
-    deselectAllBtn.addEventListener('click', function() {
-        userCheckboxes.forEach(checkbox => {
-            checkbox.checked = false;
+    if (deselectAllBtn) {
+        deselectAllBtn.addEventListener('click', function() {
+            userCheckboxes.forEach(checkbox => {
+                checkbox.checked = false;
+            });
+            if (selectAllCheckbox) {
+                selectAllCheckbox.checked = false;
+                selectAllCheckbox.indeterminate = false;
+            }
         });
-        selectAllCheckbox.checked = false;
-        selectAllCheckbox.indeterminate = false;
-    });
+    }
 
     // Send notifications button
     sendNotificationsBtn.addEventListener('click', function(e) {
