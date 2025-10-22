@@ -402,51 +402,110 @@ document.addEventListener('DOMContentLoaded', function() {
     const loadSampleTemplate = document.getElementById('loadSampleTemplate');
 
     // Toggle email editor
-    editEmailBtn.addEventListener('click', function() {
-        emailEditor.classList.toggle('hidden');
-        if (!emailEditor.classList.contains('hidden')) {
+    if (editEmailBtn && emailEditor) {
+        // Edit email button functionality
+        editEmailBtn.addEventListener('click', function() {
+        if (emailEditor.classList.contains('hidden')) {
+            emailEditor.classList.remove('hidden');
+            editEmailBtn.innerHTML = '<i data-lucide="eye-off" class="w-4 h-4"></i><span>Hide Editor</span>';
+            editEmailBtn.classList.remove('bg-green-600', 'hover:bg-green-700');
+            editEmailBtn.classList.add('bg-gray-600', 'hover:bg-gray-700');
             // Scroll to editor
             emailEditor.scrollIntoView({ behavior: 'smooth' });
+        } else {
+            emailEditor.classList.add('hidden');
+            editEmailBtn.innerHTML = '<i data-lucide="edit" class="w-4 h-4"></i><span>Edit Email</span>';
+            editEmailBtn.classList.remove('bg-gray-600', 'hover:bg-gray-700');
+            editEmailBtn.classList.add('bg-green-600', 'hover:bg-green-700');
         }
-    });
-
+        });
     // Close email editor
-    closeEmailEditor.addEventListener('click', function() {
-        emailEditor.classList.add('hidden');
+    if (closeEmailEditor) {
+            closeEmailEditor.addEventListener('click', function() {
+                emailEditor.classList.add('hidden');
+                editEmailBtn.innerHTML = '<i data-lucide="edit" class="w-4 h-4"></i><span>Edit Email</span>';
+                editEmailBtn.classList.remove('bg-gray-600', 'hover:bg-gray-700');
+                editEmailBtn.classList.add('bg-green-600', 'hover:bg-green-700');
+            });
+        }
+    }
     });
 
     // Toggle custom content editor
-    useCustomContent.addEventListener('change', function() {
-        if (this.checked) {
-            customContentEditor.classList.remove('hidden');
+    if (useCustomContent && customContentEditor && emailPreview) {
+        useCustomContent.addEventListener('change', function() {
+            if (this.checked) {
+                customContentEditor.classList.remove('hidden');
+            } else {
+                customContentEditor.classList.add('hidden');
+            }
+            // Clear preview when toggling
+            emailPreview.innerHTML = '<div class="text-center py-8"><i data-lucide="mail" class="w-8 h-8 text-gray-400 mx-auto mb-2"></i><p class="text-gray-500 text-sm">Click "Preview Email" to see how the email will look.</p></div>';
+        });
+    }
+    // Function to show sample preview when no users are available
+    function showSamplePreview(subject, content, useCustom) {
+        let previewContent;
+        
+        if (useCustom && content) {
+            // Replace placeholders with sample data
+            previewContent = content
+                .replace(/{user_name}/g, 'John Doe')
+                .replace(/{user_email}/g, 'john.doe@example.com')
+                .replace(/{lakbay_id}/g, 'LC2024001')
+                .replace(/{stamps_count}/g, '9');
+            previewContent = previewContent.replace(/\n/g, '<br>');
         } else {
-            customContentEditor.classList.add('hidden');
+            // Default template with sample data
+            previewContent = `
+                <p>Dear John Doe,</p>
+                <p>🎉 Congratulations! You have collected 9 stamps and are now eligible for a special reward!</p>
+                <p>Your Lakbay ID: LC2024001</p>
+                <p>Please visit the Calamba Tourism Office to claim your reward.</p>
+                <br>
+                <p>Best regards,<br>Calamba Tourism Office</p>
+            `;
         }
-        // Clear preview when toggling
-        emailPreview.innerHTML = '<div class="text-center py-8"><i data-lucide="mail" class="w-8 h-8 text-gray-400 mx-auto mb-2"></i><p class="text-gray-500 text-sm">Select a user and click "Preview Email" to see how the email will look.</p></div>';
-    });
+        
+        emailPreview.innerHTML = `
+            <div class="border border-gray-300 rounded-lg p-4 bg-white">
+                <div class="mb-3 pb-2 border-b border-gray-200">
+                    <h4 class="font-semibold text-gray-800">Subject: ${subject}</h4>
+                    <p class="text-xs text-gray-500 mt-1">📝 Sample Preview (No eligible users available)</p>
+                </div>
+                <div class="email-content">
+                    ${previewContent}
+                </div>
+            </div>
+        `;
+    }
 
     // Preview email functionality
-    previewEmailBtn.addEventListener('click', function() {
+    if (previewEmailBtn && emailSubject && emailContent && useCustomContent && emailPreview) {
+        previewEmailBtn.addEventListener('click', function() {
         const checkedUsers = document.querySelectorAll('.user-checkbox:checked');
-        
-        if (checkedUsers.length === 0) {
-            alert('Please select at least one user to preview the email.');
-            return;
-        }
-
-        if (checkedUsers.length > 1) {
-            alert('Please select only one user to preview the email.');
-            return;
-        }
-
-        const userId = checkedUsers[0].value;
         const subject = emailSubject.value;
         const content = emailContent.value;
         const useCustom = useCustomContent.checked;
 
         // Show loading state
         emailPreview.innerHTML = '<div class="flex items-center justify-center p-8"><div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div><span class="ml-2 text-gray-600">Loading preview...</span></div>';
+
+        // Use first available user for preview, or create a sample user
+        let userId = null;
+        if (checkedUsers.length > 0) {
+            userId = checkedUsers[0].value;
+        } else {
+            // Use the first user from the list for preview
+            const firstUserCheckbox = document.querySelector('.user-checkbox');
+            if (firstUserCheckbox) {
+                userId = firstUserCheckbox.value;
+            } else {
+                // No users available, show sample preview
+                showSamplePreview(subject, content, useCustom);
+                return;
+            }
+        }
 
         // Make AJAX request to preview email
         fetch('{{ route("superadmin.preview-email") }}', {
@@ -483,7 +542,8 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error('Error:', error);
             emailPreview.innerHTML = '<div class="text-red-600 p-4">Error loading email preview. Please try again.</div>';
         });
-    });
+        });
+    }
 
     // Reset email settings
     resetEmailSettings.addEventListener('click', function() {
