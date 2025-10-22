@@ -286,38 +286,51 @@ document.addEventListener('DOMContentLoaded', function() {
     const sendNotificationsBtn = document.getElementById('sendNotificationsBtn');
 
     // Select All functionality
-    selectAllCheckbox.addEventListener('change', function() {
-        userCheckboxes.forEach(checkbox => {
-            checkbox.checked = this.checked;
+    if (selectAllCheckbox) {
+        selectAllCheckbox.addEventListener('change', function() {
+            userCheckboxes.forEach(checkbox => {
+                checkbox.checked = this.checked;
+            });
         });
-    });
+    }
+}
 
     // Individual checkbox change
     userCheckboxes.forEach(checkbox => {
         checkbox.addEventListener('change', function() {
             const checkedCount = document.querySelectorAll('.user-checkbox:checked').length;
-            selectAllCheckbox.checked = checkedCount === userCheckboxes.length;
-            selectAllCheckbox.indeterminate = checkedCount > 0 && checkedCount < userCheckboxes.length;
+            if (selectAllCheckbox) {
+                selectAllCheckbox.checked = checkedCount === userCheckboxes.length;
+                selectAllCheckbox.indeterminate = checkedCount > 0 && checkedCount < userCheckboxes.length;
+            }
         });
     });
 
     // Select All button
-    selectAllBtn.addEventListener('click', function() {
-        userCheckboxes.forEach(checkbox => {
-            checkbox.checked = true;
+    if (selectAllBtn) {
+        selectAllBtn.addEventListener('click', function() {
+            userCheckboxes.forEach(checkbox => {
+                checkbox.checked = true;
+            });
+            if (selectAllCheckbox) {
+                selectAllCheckbox.checked = true;
+                selectAllCheckbox.indeterminate = false;
+            }
         });
-        selectAllCheckbox.checked = true;
-        selectAllCheckbox.indeterminate = false;
-    });
+    }
 
     // Deselect All button
-    deselectAllBtn.addEventListener('click', function() {
-        userCheckboxes.forEach(checkbox => {
-            checkbox.checked = false;
+    if (deselectAllBtn) {
+        deselectAllBtn.addEventListener('click', function() {
+            userCheckboxes.forEach(checkbox => {
+                checkbox.checked = false;
+            });
+            if (selectAllCheckbox) {
+                selectAllCheckbox.checked = false;
+                selectAllCheckbox.indeterminate = false;
+            }
         });
-        selectAllCheckbox.checked = false;
-        selectAllCheckbox.indeterminate = false;
-    });
+    }
 
     // Send notifications button
     sendNotificationsBtn.addEventListener('click', function(e) {
@@ -385,8 +398,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     /
 
-    // Edit email button functionality
-    editEmailBtn.addEventListener('click', function() {
+    // Check if all required elements exist before adding event listeners
+    if (editEmailBtn && emailEditor) {
+        editEmailBtn.addEventListener('click', function() {
        
         if (emailEditor.classList.contains('hidden')) {
             emailEditor.classList.remove('hidden');
@@ -403,27 +417,33 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-     // Close email editor
-     closeEmailEditor.addEventListener('click', function() {
-        emailEditor.classList.add('hidden');
-        editEmailBtn.innerHTML = '<i data-lucide="edit" class="w-4 h-4"></i><span>Edit Email</span>';
-        editEmailBtn.classList.remove('bg-gray-600', 'hover:bg-gray-700');
-        editEmailBtn.classList.add('bg-green-600', 'hover:bg-green-700');
-    });
+      // Close email editor
+      if (closeEmailEditor) {
+            closeEmailEditor.addEventListener('click', function() {
+                emailEditor.classList.add('hidden');
+                editEmailBtn.innerHTML = '<i data-lucide="edit" class="w-4 h-4"></i><span>Edit Email</span>';
+                editEmailBtn.classList.remove('bg-gray-600', 'hover:bg-gray-700');
+                editEmailBtn.classList.add('bg-green-600', 'hover:bg-green-700');
+            });
+        }
+    }
 
     // Toggle custom content editor
-    useCustomContent.addEventListener('change', function() {
-        if (this.checked) {
-            customContentEditor.classList.remove('hidden');
-        } else {
-            customContentEditor.classList.add('hidden');
-        }
-        // Clear preview when toggling
-        emailPreview.innerHTML = '<div class="text-center py-8"><i data-lucide="mail" class="w-8 h-8 text-gray-400 mx-auto mb-2"></i><p class="text-gray-500 text-sm">Click "Preview Email" to see how the email will look.</p></div>';
-    });
+    if (useCustomContent && customContentEditor && emailPreview) {
+        useCustomContent.addEventListener('change', function() {
+            if (this.checked) {
+                customContentEditor.classList.remove('hidden');
+            } else {
+                customContentEditor.classList.add('hidden');
+            }
+            // Clear preview when toggling
+            emailPreview.innerHTML = '<div class="text-center py-8"><i data-lucide="mail" class="w-8 h-8 text-gray-400 mx-auto mb-2"></i><p class="text-gray-500 text-sm">Click "Preview Email" to see how the email will look.</p></div>';
+        });
+    }
 
     // Preview email functionality
-    previewEmailBtn.addEventListener('click', function() {
+    if (previewEmailBtn && emailSubject && emailContent && useCustomContent && emailPreview) {
+        previewEmailBtn.addEventListener('click', function() {
         const checkedUsers = document.querySelectorAll('.user-checkbox:checked');
         
         
@@ -482,6 +502,8 @@ document.addEventListener('DOMContentLoaded', function() {
             emailPreview.innerHTML = '<div class="text-red-600 p-4">Error loading email preview. Please try again.</div>';
         });
     });
+    }
+
 
     // Reset email settings
     resetEmailSettings.addEventListener('click', function() {
@@ -507,8 +529,9 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Load sample template
-    loadSampleTemplate.addEventListener('click', function() {
-        const sampleTemplate = `Dear {user_name},
+    if (loadSampleTemplate && emailContent) {
+        loadSampleTemplate.addEventListener('click', function() {
+            const sampleTemplate = `Dear {user_name},
 
 🎉 Congratulations! You have collected {stamps_count} stamps and are now eligible for a special reward!
 
@@ -532,15 +555,22 @@ Thank you for exploring our beautiful tourist destinations in Calamba!
 
 Best regards,
 Calamba Tourism Office`;
-        
-        emailContent.value = sampleTemplate;
-        updatePreview();
-    });
+
+            emailContent.value = sampleTemplate;
+            updatePreview();
+        });
+    }
 
     // Add event listeners for real-time preview
-    emailSubject.addEventListener('input', updatePreview);
-    emailContent.addEventListener('input', updatePreview);
-    useCustomContent.addEventListener('change', updatePreview);
+    if (emailSubject) {
+        emailSubject.addEventListener('input', updatePreview);
+    }
+    if (emailContent) {
+        emailContent.addEventListener('input', updatePreview);
+    }
+    if (useCustomContent) {
+        useCustomContent.addEventListener('change', updatePreview);
+    }
 
     // Show success notification if there's a success message
     @if(session('success'))
