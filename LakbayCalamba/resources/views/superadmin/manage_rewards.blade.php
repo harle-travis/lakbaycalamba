@@ -1,4 +1,3 @@
-@ -1,631 +1,659 @@
 @extends('layouts.superadmin')
 
 @section('title', 'Manage Rewards')
@@ -17,7 +16,7 @@
     <div class="flex justify-between items-center mb-6">
         <div>
             <h1 class="text-2xl font-bold text-gray-800">Reward Management</h1>
-            <p class="text-gray-600 mt-1">Manage users eligible for rewards (4+ stamps)</p>
+            <p class="text-gray-600 mt-1">Manage users eligible for rewards (9+ stamps)</p>
         </div>
         <div class="flex items-center space-x-4">
             <span class="text-sm text-gray-500">
@@ -270,7 +269,7 @@ Calamba Tourism Office"
                 <div class="text-center py-12">
                     <i data-lucide="award" class="w-12 h-12 text-gray-400 mx-auto mb-4"></i>
                     <h3 class="text-lg font-medium text-gray-900 mb-2">No eligible users yet</h3>
-                    <p class="text-gray-500">Users need at least 4 stamps to be eligible for rewards.</p>
+                    <p class="text-gray-500">Users need at least 9 stamps to be eligible for rewards.</p>
                 </div>
             @endif
         </div>
@@ -358,7 +357,6 @@ document.addEventListener('DOMContentLoaded', function() {
         showNotification(`Sending notifications to ${checkedCount} user(s)...`, 'info');
 
         // Add form submission event listener for debugging
-        const form = document.getElementById('bulkNotificationForm');
         form.addEventListener('submit', function(e) {
             console.log('Form is being submitted!');
             console.log('Form action:', this.action);
@@ -385,34 +383,32 @@ document.addEventListener('DOMContentLoaded', function() {
     const resetEmailSettings = document.getElementById('resetEmailSettings');
     const loadSampleTemplate = document.getElementById('loadSampleTemplate');
 
-    // Toggle email editor
-    editEmailBtn.addEventListener('click', function() {
-        emailEditor.classList.toggle('hidden');
-        if (!emailEditor.classList.contains('hidden')) {
-            // Scroll to editor
-            emailEditor.scrollIntoView({ behavior: 'smooth' });
-        }
-    });
-
-    // Close email editor
-    closeEmailEditor.addEventListener('click', function() {
-        emailEditor.classList.add('hidden');
-    });
+    /
 
     // Edit email button functionality
     editEmailBtn.addEventListener('click', function() {
-        const emailEditor = document.getElementById('emailEditor');
+       
         if (emailEditor.classList.contains('hidden')) {
             emailEditor.classList.remove('hidden');
             editEmailBtn.innerHTML = '<i data-lucide="eye-off" class="w-4 h-4"></i><span>Hide Editor</span>';
             editEmailBtn.classList.remove('bg-green-600', 'hover:bg-green-700');
             editEmailBtn.classList.add('bg-gray-600', 'hover:bg-gray-700');
+             // Scroll to editor
+             emailEditor.scrollIntoView({ behavior: 'smooth' });
         } else {
             emailEditor.classList.add('hidden');
             editEmailBtn.innerHTML = '<i data-lucide="edit" class="w-4 h-4"></i><span>Edit Email</span>';
             editEmailBtn.classList.remove('bg-gray-600', 'hover:bg-gray-700');
             editEmailBtn.classList.add('bg-green-600', 'hover:bg-green-700');
         }
+    });
+
+     // Close email editor
+     closeEmailEditor.addEventListener('click', function() {
+        emailEditor.classList.add('hidden');
+        editEmailBtn.innerHTML = '<i data-lucide="edit" class="w-4 h-4"></i><span>Edit Email</span>';
+        editEmailBtn.classList.remove('bg-gray-600', 'hover:bg-gray-700');
+        editEmailBtn.classList.add('bg-green-600', 'hover:bg-green-700');
     });
 
     // Toggle custom content editor
